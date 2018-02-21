@@ -1,17 +1,19 @@
 $(function() {
     // show the loading message
-    waitingDialog.show("Loading polling station results from skipchain...",{ progressType: "success"});
-    // start fetching the data
+    //waitingDialog.show("Loading polling station results from skipchain...",{ progressType: "success"});
+    // start fetching the info to contact the skipchain: roster & genesis id
     fetchInfo().then(info => {
         var [roster,genesisID] = info;
         displayInfo(roster,genesisID);
+        // fetch the data from the roster on the given skipchain id
+        //return fetchDataFake(roster,genesisID);
         return fetchData(roster,genesisID);
     }).then(data => {
         console.log("data retrieved");
         // then fill up the table
         fillTable(data);
         console.log("table filled up with data");
-        waitingDialog.hide();
+        //waitingDialog.hide();
     }).catch(err => {
         console.log(err);
     });
@@ -24,8 +26,10 @@ $(function() {
 function fillTable(data) {
     // first set up the table columns according to the first entry
     const keys = Object.keys(data[0]);
+    console.log("keys detected: " + keys.join(" - "));
     addHeader(keys);
     for(var i = 0; i < data.length; i++) {
+        console.log("Appending row["+i+"] = ",data[i]);
         appendRow(keys,data[i]);
     }
 }
@@ -59,14 +63,43 @@ function displayInfo(roster,genesisID) {
     $("#title-skipid").text("skipchain ID: " + genesisID);
 }
 
-const rosterURL = "roster.toml";
+const rosterURL = "public.toml";
 const genesisURL = "genesis.txt";
+const dataKey = "test";
 
+const net = cothority.net;
+const misc = cothority.misc;
+// fetchData returns the data as an array of objects, the keys being the column
+// names and the value being the cells value of the final table.
+function fetchData(rosterTOML,genesisID) {
+    const roster = cothority.Roster.fromTOML(rosterTOML);
+    const cisc = new cothority.cisc.Client(roster,genesisID);
+    return cisc.getStorage().then(storage => {
+        const table = processCiscStorage(storage);
+        return Promise.resolve(table);
+    });
+}
+
+// expected storage dict
+// key: dataKey
+// value: csv file
+function processCiscStorage(storage) {
+    const csv = storage[dataKey];
+    if ((csv === undefined) || (csv == "")) {
+        console.log(storage);
+        throw new Error("there is no data associated with " + dataKey);
+    }
+
+    const parsed = Papa.parse(csv.trim(), {
+        header: true
+    });
+    return parsed.data;
+}
 // fetchData first reads the roster information and the genesisID and then
 // contact the skipchain servers and returns an arrays of objects:
-function fetchData() {
-       // XXX Fake promise returning fake data
-   return new Promise(function(resolve,reject) {
+function fetchDataFake(rosterTOML, genesisID) {
+    // XXX Fake promise returning fake data
+    return new Promise(function(resolve,reject) {
        setTimeout(function() {
            const data = [
                {
@@ -148,7 +181,7 @@ function fetchInfo() {
             dataType: "text"
         }).done(function(genesis) {
             console.log("genesis id fetched successfully: " + genesis);
-            resolve(genesis);
+            resolve(genesis.trim());
         }).fail(function(obj,text,err) {
             console.log("error fetching genesis id: " + text);
             reject(err);
