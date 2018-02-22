@@ -1,6 +1,10 @@
 $(function() {
     // show the loading message
-    waitingDialog.show("Loading polling station results from skipchain...",{ progressType: "success"});
+    var dialog = bootbox.dialog({
+        title: 'Agora - Sierra Leone 2018 elections',
+        message: '<p><i class="fa fa-spin fa-spinner"></i> Loading and verifying election data...</p>',
+        closeButton: false
+    });
     // start fetching the info to contact the skipchain: roster & genesis id
     fetchInfo().then(info => {
         var [roster,genesisID] = info;
@@ -13,13 +17,11 @@ $(function() {
         // then fill up the table
         fillTable(data);
         console.log("table filled up with data");
-        waitingDialog.hide();
+        dialog.modal("hide");
     }).catch(err => {
-        waitingDialog.hide();
+        dialog.find(".bootbox-body").html('<div class="alert alert-danger"> Oups. There\'s an error, it\'s our fault and we\'re working to fix!</div>');
         console.log(err);
     });
-    //
-    // then verify each entry
 });
 
 // fillTable takes the data returned by fetchData and display each object in the
@@ -87,7 +89,7 @@ function processCiscStorage(storage) {
     const csv = storage[dataKey()];
     if ((csv === undefined) || (csv == "")) {
         console.log(storage);
-        throw new Error("there is no data associated with " + dataKey);
+        throw new Error("there is no data associated with " + dataKey());
     }
 
     const parsed = Papa.parse(csv.trim(), {
@@ -99,11 +101,11 @@ function processCiscStorage(storage) {
 // dataKey returns a different key if we are on the test page than if we are on
 // the final page
 function dataKey() {
-    if (window.location.href.match(/test/)) {
-        return "test";
-    } else {
+    return "test";
+    if (window.location.href.match(/sl2018/)) {
         return "sl2018";
     }
+    return "test";
 }
 
 
