@@ -1,6 +1,6 @@
 $(function() {
     // show the loading message
-    //waitingDialog.show("Loading polling station results from skipchain...",{ progressType: "success"});
+    waitingDialog.show("Loading polling station results from skipchain...",{ progressType: "success"});
     // start fetching the info to contact the skipchain: roster & genesis id
     fetchInfo().then(info => {
         var [roster,genesisID] = info;
@@ -13,8 +13,9 @@ $(function() {
         // then fill up the table
         fillTable(data);
         console.log("table filled up with data");
-        //waitingDialog.hide();
+        waitingDialog.hide();
     }).catch(err => {
+        waitingDialog.hide();
         console.log(err);
     });
     //
