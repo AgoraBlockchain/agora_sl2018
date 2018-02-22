@@ -66,7 +66,6 @@ function displayInfo(roster,genesisID) {
 
 const rosterURL = "public.toml";
 const genesisURL = "genesis.txt";
-const dataKey = "test";
 
 const net = cothority.net;
 const misc = cothority.misc;
@@ -82,10 +81,10 @@ function fetchData(rosterTOML,genesisID) {
 }
 
 // expected storage dict
-// key: dataKey
+// key: dataKey()
 // value: csv file
 function processCiscStorage(storage) {
-    const csv = storage[dataKey];
+    const csv = storage[dataKey()];
     if ((csv === undefined) || (csv == "")) {
         console.log(storage);
         throw new Error("there is no data associated with " + dataKey);
@@ -96,6 +95,18 @@ function processCiscStorage(storage) {
     });
     return parsed.data;
 }
+
+// dataKey returns a different key if we are on the test page than if we are on
+// the final page
+function dataKey() {
+    if (window.location.href.match(/test/)) {
+        return "test";
+    } else {
+        return "sl2018";
+    }
+}
+
+
 // fetchData first reads the roster information and the genesisID and then
 // contact the skipchain servers and returns an arrays of objects:
 function fetchDataFake(rosterTOML, genesisID) {
