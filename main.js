@@ -101,8 +101,7 @@ function processCiscStorage(storage) {
 // dataKey returns a different key if we are on the test page than if we are on
 // the final page
 function dataKey() {
-    return "test";
-    if (window.location.href.match(/sl2018/)) {
+    if (window.location.href.match(/sl2018.agora.vote/)) {
         return "sl2018";
     }
     return "test";
