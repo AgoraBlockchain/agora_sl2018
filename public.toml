@@ -1,10 +1,15 @@
 [[servers]]
-  Address = "tls://localhost:2002"
-  Suite = "Ed25519"
-  Public = "afccf9f227f7b0c09cfbab7da866ec5c30627486dd880b702b779134b70aba2c"
-  Description = "Cot-1"
+  Address = "tls://conode.dedis.ch:7770"
+  Public = "036bf316e1ea6e7e99e0bb713419d16c0b6794bf9dc442cc4cf36c3f935e93cf"
+  Description = "EPFL Cothority-server"
+
 [[servers]]
-  Address = "tls://localhost:2004"
+  Address = "tls://dedis.nella.org:6879"
+  Public = "4e3008c1a2b6e022fb60b76b834f174911653e9c9b4156cc8845bfb334075655"
+  Description = "Jeff's server - dedis.nella.org"
+
+[[servers]]
+  Address = "tls://employees.org:6879"
   Suite = "Ed25519"
-  Public = "1766f89568e9d6a63935f6400f211f458636e616f5f212a5d1b921ab542839de"
-  Description = "Cot-2"
+  Public = "1e7f67a33f945f13db2f51ae1547e5678d88e40cd599611a4f7deede29d8abea"
+  Description = "jra@employees.org"
