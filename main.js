@@ -20,7 +20,8 @@ $(function() {
         dialog.modal("hide");
     }).catch(err => {
         dialog.find(".bootbox-body").html('<div class="alert alert-danger"> Oups. There\'s an error, it\'s our fault and we\'re working to fix!</div>');
-        console.log(err);
+        //console.log(err);
+        throw err;
     });
 });
 
@@ -75,7 +76,8 @@ const misc = cothority.misc;
 // names and the value being the cells value of the final table.
 function fetchData(rosterTOML,genesisID) {
     const roster = cothority.Roster.fromTOML(rosterTOML);
-    const cisc = new cothority.cisc.Client(roster,genesisID);
+    console.log("using genesisID",genesisID);
+    const cisc = new cothority.cisc.Client(roster.curve(),roster,genesisID);
     return cisc.getStorage().then(storage => {
         const table = processCiscStorage(storage);
         return Promise.resolve(table);
@@ -107,70 +109,6 @@ function dataKey() {
     return "test";
 }
 
-
-// fetchData first reads the roster information and the genesisID and then
-// contact the skipchain servers and returns an arrays of objects:
-function fetchDataFake(rosterTOML, genesisID) {
-    // XXX Fake promise returning fake data
-    return new Promise(function(resolve,reject) {
-       setTimeout(function() {
-           const data = [
-               {
-                   "polling": "freetown #1",
-                   "candidate 1": "5670",
-                   "candidate 2": "5670",
-                   "candidate 3": "5670",
-                   "candidate 4": "5670",
-                   "candidate 5": "5670",
-                   "candidate 6": "5670",
-                   "null votes": "5670",
-               },
-               {
-                   "polling": "freetwon #2",
-                   "candidate 1": "5670",
-                   "candidate 2": "5670",
-                   "candidate 3": "5670",
-                   "candidate 4": "5670",
-                   "candidate 5": "5670",
-                   "candidate 6": "5670",
-                   "null votes": "5670",
-               },
-               {
-                   "polling": "freetwon #3",
-                   "candidate 1": "5670",
-                   "candidate 2": "5670",
-                   "candidate 3": "5670",
-                   "candidate 4": "5670",
-                   "candidate 6": "5670",
-                   "null votes": "5670",
-               },
-               {
-                   "polling": "freetwon #4",
-                   "candidate 1": "5670",
-                   "candidate 2": "5670",
-                   "candidate 3": "5670",
-                   "candidate 4": "5670",
-                   "candidate 5": "5670",
-                   "candidate 6": "5670",
-                   "null votes": "5670",
-               },
-               {
-                   "polling": "freetwon #5",
-                   "candidate 1": "5670",
-                   "candidate 2": "5670",
-                   "candidate 3": "5670",
-                   "candidate 4": "5670",
-                   "candidate 5": "5670",
-                   "candidate 6": "5670",
-                   "null votes": "5670",
-               },
-
-           ];
-           resolve(data);
-       }, 700);
-   });
-}
-
 // fetchInfo will fetch the roster and the genesis block id and return a Promise
 // which holds [roster,genesisID] as a value.
 function fetchInfo() {
@@ -181,7 +119,7 @@ function fetchInfo() {
             dataType: "text"
         }).done(function(roster) {
                 console.log("roster fetched sucesfully: " + roster);
-                resolve(roster);
+                resolve(roster.trim());
         }).fail(function(obj, text,err) {
             console.log("error fetching roster: " + text);
             reject(err);
