@@ -1,3 +1,24 @@
+// //////////////////
+// Constants
+// //////////////////
+// the url to get the roster
+const rosterURL = "public.toml";
+// the url to get the genesis file
+const genesisURL = "genesis.txt";
+
+// ////////////////
+// Modules
+// ///////////////
+const net = cothority.net;
+const misc = cothority.misc;
+
+// //////////////
+// Global data
+// /////////////
+var data = {};
+var fields = [];
+
+// init page
 $(function() {
     // show the loading message
     var dialog = bootbox.dialog({
@@ -12,18 +33,101 @@ $(function() {
         // fetch the data from the roster on the given skipchain id
         //return fetchDataFake(roster,genesisID);
         return fetchData(roster,genesisID);
-    }).then(data => {
-        console.log("data retrieved");
+    }).then(csvParsed => {
+        data = csvParsed.data;
+        fields = csvParsed.meta.fields;
+        console.log("data retrieved with fields ",fields);
         // then fill up the table
         fillTable(data);
         console.log("table filled up with data");
-        dialog.modal("hide");
+        const aggResults = aggregateData(data,fields.slice(1))
+        console.log("aggregated results:");
+        console.log(aggResults);
+        setTimeout(function() {
+            dialog.modal("hide");
+        },1000);
     }).catch(err => {
         dialog.find(".bootbox-body").html('<div class="alert alert-danger"> Oups. There\'s an error, it\'s our fault and we\'re working to fix!</div>');
         //console.log(err);
         throw err;
     });
 });
+
+// aggregateData returns an aggregated version of all the datas. It computes the
+// sum for each candidate for each pollign stations.
+// data is expected to be an array of dictionary where each item represents the
+// data of one pollign station
+// [
+//  { polling: <name>, candidate1: <x vote> }
+//  ...
+// ]
+//
+// Fields are the fields to aggregate. All candidate1 values will be aggregated
+// together for example.
+// NOTE: fields MUST NOT INCLUDE the polling station column, i.e. the first
+// column of the csv
+function aggregateData(data,fields) {
+    const aggregated = {};
+    // arr2.reduce((acc,key) => { acc[key] = di.map(entry => entry[key]).reduce((a,b) => a+b,0); return acc },{})
+    return fields.reduce((acc,key) => {
+        acc[key] = data.map(entry => entry[key]).reduce((a,b) => a+b,0);
+        return acc;
+    }, {});
+}
+
+// fetchData returns the data as an array of objects, the keys being the column
+// names and the value being the cells value of the final table.
+function fetchData(rosterTOML,genesisID) {
+    const roster = cothority.Roster.fromTOML(rosterTOML);
+    console.log("using genesisID",genesisID);
+    const cisc = new cothority.cisc.Client(roster.curve(),roster,genesisID);
+    return cisc.getStorage().then(storage => {
+        const table = processCiscStorage(storage);
+        return Promise.resolve(table);
+    });
+}
+
+// expected storage dict
+// key: dataKey()
+// value: csv file
+// IT returns the output of Papa library
+// It returns a dictionnary where the keys are the polling station names and the
+// value is a dictionary of Candidate X => vote
+function processCiscStorage(storage) {
+    const csv = storage[dataKey()];
+    if ((csv === undefined) || (csv == "")) {
+        console.log(storage);
+        throw new Error("there is no data associated with " + dataKey());
+    }
+
+    const parsed = Papa.parse(csv.trim(), {
+        header:true,
+        dynamicTyping: true,
+    });
+
+    // replace "" by 0 for all numerical columns
+    parsed.data.forEach(dict => {
+        const keys = Object.keys(dict);
+        // remove the first column since its NOT number but polling station
+        // names
+        keys.shift();
+        keys.forEach(key => {
+            if (typeof dict[key] !== "number") {
+                dict[key] = 0;
+            }
+        });
+    });
+    return parsed;
+}
+
+// dataKey returns a different key if we are on the test page than if we are on
+// the final page
+function dataKey() {
+    if (window.location.href.match(/sl2018.agora.vote/)) {
+        return "sl2018";
+    }
+    return "test";
+}
 
 // fillTable takes the data returned by fetchData and display each object in the
 // array as one line in the table.
@@ -45,7 +149,7 @@ function appendRow(keys,row) {
     for(var i = 0; i < keys.length; i++) {
         const key = keys[i];
         var text = row[key];
-        if (text === undefined) text = "<missing data>";
+        if (text === undefined) text = "";
         $("<td></td>").text(text).appendTo(tr);
     }
     $("#results-table tbody").append(tr);
@@ -67,47 +171,6 @@ function displayInfo(roster,genesisID) {
     $("#title-skipid").text("skipchain ID: " + genesisID);
 }
 
-const rosterURL = "public.toml";
-const genesisURL = "genesis.txt";
-
-const net = cothority.net;
-const misc = cothority.misc;
-// fetchData returns the data as an array of objects, the keys being the column
-// names and the value being the cells value of the final table.
-function fetchData(rosterTOML,genesisID) {
-    const roster = cothority.Roster.fromTOML(rosterTOML);
-    console.log("using genesisID",genesisID);
-    const cisc = new cothority.cisc.Client(roster.curve(),roster,genesisID);
-    return cisc.getStorage().then(storage => {
-        const table = processCiscStorage(storage);
-        return Promise.resolve(table);
-    });
-}
-
-// expected storage dict
-// key: dataKey()
-// value: csv file
-function processCiscStorage(storage) {
-    const csv = storage[dataKey()];
-    if ((csv === undefined) || (csv == "")) {
-        console.log(storage);
-        throw new Error("there is no data associated with " + dataKey());
-    }
-
-    const parsed = Papa.parse(csv.trim(), {
-        header: true
-    });
-    return parsed.data;
-}
-
-// dataKey returns a different key if we are on the test page than if we are on
-// the final page
-function dataKey() {
-    if (window.location.href.match(/sl2018.agora.vote/)) {
-        return "sl2018";
-    }
-    return "test";
-}
 
 // fetchInfo will fetch the roster and the genesis block id and return a Promise
 // which holds [roster,genesisID] as a value.

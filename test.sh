@@ -19,7 +19,7 @@ rm -r "$ciscPath/build"
 echo "[+] Starting the local conodes in background (log > out.log)"
 $ciscPath/start_test.sh $file -nt &
 pid=$!
-sleep 6
+sleep 8
 
 echo "[+] Copying public.toml & genesis.txt" 
 cp "build/public.toml" "$currDir/public.toml"
