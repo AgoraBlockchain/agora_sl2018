@@ -6,6 +6,8 @@ const rosterURL = "public.toml";
 // the url to get the genesis file
 const genesisURL = "genesis.txt";
 
+const selectKeyAll = "All";
+
 // ////////////////
 // Modules
 // ///////////////
@@ -17,6 +19,7 @@ const misc = cothority.misc;
 // /////////////
 var data = {};
 var fields = [];
+var aggregated = {};
 
 // init page
 $(function() {
@@ -36,13 +39,19 @@ $(function() {
     }).then(csvParsed => {
         data = csvParsed.data;
         fields = csvParsed.meta.fields;
-        console.log("data retrieved with fields ",fields);
-        // then fill up the table
-        fillTable(data);
-        console.log("table filled up with data");
-        const aggResults = aggregateData(data,fields.slice(1))
-        console.log("aggregated results:");
-        console.log(aggResults);
+        aggregated = aggregateData(data,fields.slice(1))
+        console.log(data);
+        console.log(aggregated);
+        return Promise.resolve(true);
+    }).then(() => {
+        // fill the drop down list with the name of the polling stations
+        const list = [selectKeyAll].concat(data.map(entry => entry[fields[0]]));
+        fillSelect(list,selectCallback);
+        // fill the table
+        fillHeaders(fields);
+        fillTable(data,fields);
+        // fill the aggregated data
+        fillAggregated(aggregated);
         setTimeout(function() {
             dialog.modal("hide");
         },1000);
@@ -52,6 +61,17 @@ $(function() {
         throw err;
     });
 });
+
+function selectCallback(event) {
+    const selection = $("select option:selected").text();
+    if (selection === selectKeyAll) {
+        fillTable(data,fields);
+        return
+    }
+    const key = fields[0];
+    const filtered = data.filter(dict => dict[key] === selection);
+    fillTable(filtered,fields);
+}
 
 // aggregateData returns an aggregated version of all the datas. It computes the
 // sum for each candidate for each pollign stations.
@@ -128,49 +148,6 @@ function dataKey() {
     }
     return "test";
 }
-
-// fillTable takes the data returned by fetchData and display each object in the
-// array as one line in the table.
-function fillTable(data) {
-    // first set up the table columns according to the first entry
-    const keys = Object.keys(data[0]);
-    console.log("keys detected: " + keys.join(" - "));
-    addHeader(keys);
-    for(var i = 0; i < data.length; i++) {
-        console.log("Appending row["+i+"] = ",data[i]);
-        appendRow(keys,data[i]);
-    }
-}
-
-// appendRow fills up the table with the given object (row) by using only the
-// keys specified.
-function appendRow(keys,row) {
-    const tr = $("<tr></tr>");
-    for(var i = 0; i < keys.length; i++) {
-        const key = keys[i];
-        var text = row[key];
-        if (text === undefined) text = "";
-        $("<td></td>").text(text).appendTo(tr);
-    }
-    $("#results-table tbody").append(tr);
-}
-
-// addHeader fills up the header table columns
-function addHeader(keys) {
-    $("#results-table")
-    const tr = $('<tr></tr>').attr({ class: ["class2", "class3"].join(' ') });
-    for(var i = 0; i < keys.length; i++) {
-        const th = $('<th></th>').text(keys[i]).attr({scope:"col"}).appendTo(tr);
-    }
-    $("#results-table thead").append(tr);
-}
-
-// displayInfo writes some info about the roster and the skipchain id the page
-// is using
-function displayInfo(roster,genesisID) {
-    $("#title-skipid").text("skipchain ID: " + genesisID);
-}
-
 
 // fetchInfo will fetch the roster and the genesis block id and return a Promise
 // which holds [roster,genesisID] as a value.

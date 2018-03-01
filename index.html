@@ -17,7 +17,15 @@
             <h1> Sierra Leone Elections 2018 - Agora results</h1>
             <pre id="title-skipid"></pre>
           </div>
-          <div class="row">
+          <div class="row" id="aggregated-row" style="display: none;">
+             <textarea id="aggregated-results" rows="4" cols="50">
+            </textarea> 
+          </div>
+          <div class="row form-group">
+              <label for="select-polling">Select list:</label>
+              <select class="form-control" id="select-polling"> </select>
+          </div>
+                    <div class="row">
             <table class="table table-inverse" id="results-table">
               <thead>
               </thead>
@@ -34,6 +42,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.3.7/papaparse.js"></script>
     <script src="bootbox.min.js"></script>
     <script src="cothority.js"></script>
+    <script src="view.js"></script>
     <script src="main.js"></script>
   </body>
 </html>
