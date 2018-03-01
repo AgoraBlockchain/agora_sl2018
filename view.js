@@ -18,8 +18,28 @@ function fillSelect(names,callback) {
 
 // fill the aggregated textarea => TO CHANGE with a nice graph
 function fillAggregated(aggregated) {
-    $("#aggregated-results").text(JSON.stringify(aggregated));
-    $("#aggregated-row").css('display','');
+    //$("#aggregated-results").text(JSON.stringify(aggregated));
+    //$("#aggregated-row").css('display','');
+    const rows = Object.keys(aggregated).map(key => [key,aggregated[key]]);
+    const drawChart = function() {
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Candidate');
+        data.addColumn('number', 'Votes');
+        data.addRows(rows);
+        // Set chart options
+        var options = {'title':titleChart,
+                       'width':500,
+                       'height':300};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+        chart.draw(data, options);
+
+    }
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.charts.setOnLoadCallback(drawChart);
 }
 
 // fillTable takes the data returned by fetchData and display each object in the

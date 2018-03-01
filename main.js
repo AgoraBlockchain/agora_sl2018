@@ -6,7 +6,9 @@ const rosterURL = "public.toml";
 // the url to get the genesis file
 const genesisURL = "genesis.txt";
 
+// key representing "all" data from the drop down list
 const selectKeyAll = "All";
+const titleChart = "Election Results";
 
 // ////////////////
 // Modules
@@ -23,7 +25,9 @@ var aggregated = {};
 
 // init page
 $(function() {
-    // show the loading message
+    // Load the Visualization API and the corechart package.
+    google.charts.load('current', {'packages':['corechart']});
+       // show the loading message
     var dialog = bootbox.dialog({
         title: 'Agora - Sierra Leone 2018 elections',
         message: '<p><i class="fa fa-spin fa-spinner"></i> Loading and verifying election data...</p>',
@@ -62,6 +66,10 @@ $(function() {
     });
 });
 
+
+
+// selectCallback is called whenever a selection changes from the drop down
+// list of polling station names
 function selectCallback(event) {
     const selection = $("select option:selected").text();
     if (selection === selectKeyAll) {
@@ -181,3 +189,5 @@ function fetchInfo() {
 
     return Promise.all([rosterPromise,genesisPromise])
 }
+
+
