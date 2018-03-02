@@ -10,6 +10,9 @@ const genesisURL = "genesis.txt";
 const selectKeyAll = "All";
 const titleChart = "Election Results";
 
+const keyTest = "test";
+const keyProduction = "sl2018";
+
 // ////////////////
 // Modules
 // ///////////////
@@ -151,9 +154,9 @@ function processCiscStorage(storage) {
 // the final page
 function dataKey() {
     if (window.location.href.match(/sl2018.agora.vote/)) {
-        return "sl2018";
+        return keyProduction;
     }
-    return "test";
+    return keyTest;
 }
 
 // fetchInfo will fetch the roster and the genesis block id and return a Promise
