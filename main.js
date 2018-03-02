@@ -5,6 +5,10 @@
 const rosterURL = "public.toml";
 // the url to get the genesis file
 const genesisURL = "genesis.txt";
+// ethereum data.json
+const ethDataJson = "data.json";
+const ethContractAddr = "contract.address";
+const ethContractAbi = "contract.abi";
 
 // key representing "all" data from the drop down list
 const selectKeyAll = "All";
@@ -22,8 +26,8 @@ const misc = cothority.misc;
 // //////////////
 // Global data
 // /////////////
-var data = {};
-var fields = [];
+var skipData = {};
+var skipFields = [];
 var aggregated = {};
 
 // init page
@@ -35,27 +39,13 @@ $(function() {
         message: '<p><i class="fa fa-spin fa-spinner"></i> Loading and verifying election data...</p>',
         closeButton: false
     });
-    // start fetching the info to contact the skipchain: roster & genesis id
-    fetchInfo().then(info => {
-        var [roster,genesisID] = info;
-        displayInfo(roster,genesisID);
-        // fetch the data from the roster on the given skipchain id
-        //return fetchDataFake(roster,genesisID);
-        return fetchData(roster,genesisID);
-    }).then(csvParsed => {
-        data = csvParsed.data;
-        fields = csvParsed.meta.fields;
-        aggregated = aggregateData(data,fields.slice(1))
-        console.log(data);
-        console.log(aggregated);
-        return Promise.resolve(true);
-    }).then(() => {
+    collectSkipchain().then(() => {
         // fill the drop down list with the name of the polling stations
-        const list = [selectKeyAll].concat(data.map(entry => entry[fields[0]]));
+        const list = [selectKeyAll].concat(skipData.map(entry => entry[skipFields[0]]));
         fillSelect(list,selectCallback);
         // fill the table
-        fillHeaders(fields);
-        fillTable(data,fields);
+        fillHeaders(skipFields);
+        fillTable(skipData,skipFields);
         // fill the aggregated data
         fillAggregated(aggregated);
         setTimeout(function() {
@@ -68,6 +58,71 @@ $(function() {
     });
 });
 
+// collectEthereum does the following:
+//  1. grabs data.json (output from geens/cli command) file and parses it
+//  2. run the verifier command library
+function collectEthereum() {
+    // get the data
+    const fetchData = new Promise(function(resolve,reject) {
+        $.ajax({
+            url:ethDataJson,
+            dataType: "json"
+        }).done(function(jsonData) {
+            console.log("ethereum data json file fetched successfully.");
+            resolve(JSON.parse(jsonData.trim()));
+        }).fail(function(obj,text,err) {
+            console.log("error fetching data json file: " + text);
+            reject(err);
+        });
+    });
+    const fetchAddress = new Promise(function(resolve,reject) {
+        $.ajax({
+            url:ethContractAddr,
+            dataType: "text"
+        }).done(function(address) {
+            console.log("ethereum contract address fetched successfully.",address);
+            resolve(address.trim());
+        }).fail(function(obj,text,err) {
+            console.log("error fetching contract address file: " + text);
+            reject(err);
+        });
+
+    });
+
+    return Promise.all(fetchData,fetchAddress).then(data => {
+        var [pollingData,address] = data;
+        try {
+            verifier.getObjectAndVerify(pollingData,address,ethContractAbi);
+            return Promise.resolve(pollingData);
+        } catch(err) {
+            return Promise.reject(err);
+        }
+    });
+}
+
+// collectSkipchain does the following:
+// 1. fetch the skipchain for latest block
+// 2. interpet the data in CSV
+// 3. aggregate the data
+// 4. sets the global value to be the data + aggregated
+// It returns a Promise with true if all went well
+function collectSkipchain() {
+    // start fetching the info to contact the skipchain: roster & genesis id
+    return fetchInfo().then(info => {
+        var [roster,genesisID] = info;
+        displayInfo(roster,genesisID);
+        // fetch the data from the roster on the given skipchain id
+        //return fetchDataFake(roster,genesisID);
+        return fetchData(roster,genesisID);
+    }).then(csvParsed => {
+        skipData = csvParsed.data;
+        skipFields = csvParsed.meta.fields;
+        aggregated = aggregateData(skipData,skipFields.slice(1))
+        console.log(skipData);
+        console.log(aggregated);
+        return Promise.resolve(true);
+    );
+}
 
 
 // selectCallback is called whenever a selection changes from the drop down
@@ -75,12 +130,12 @@ $(function() {
 function selectCallback(event) {
     const selection = $("select option:selected").text();
     if (selection === selectKeyAll) {
-        fillTable(data,fields);
+        fillTable(skipData,skipFields);
         return
     }
-    const key = fields[0];
-    const filtered = data.filter(dict => dict[key] === selection);
-    fillTable(filtered,fields);
+    const key = skipFields[0];
+    const filtered = skipData.filter(dict => dict[key] === selection);
+    fillTable(filtered,skipFields);
 }
 
 // aggregateData returns an aggregated version of all the datas. It computes the
