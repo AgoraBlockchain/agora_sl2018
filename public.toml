@@ -1,15 +1,20 @@
 [[servers]]
-  Address = "tls://conode.dedis.ch:7770"
-  Public = "036bf316e1ea6e7e99e0bb713419d16c0b6794bf9dc442cc4cf36c3f935e93cf"
-  Description = "EPFL Cothority-server"
-
-[[servers]]
-  Address = "tls://dedis.nella.org:6879"
-  Public = "4e3008c1a2b6e022fb60b76b834f174911653e9c9b4156cc8845bfb334075655"
-  Description = "Jeff's server - dedis.nella.org"
-
-[[servers]]
-  Address = "tls://employees.org:6879"
+  Address = "tls://192.33.210.8:9900"
   Suite = "Ed25519"
-  Public = "1e7f67a33f945f13db2f51ae1547e5678d88e40cd599611a4f7deede29d8abea"
-  Description = "jra@employees.org"
+  Public = "f57bd9f724533ef81f2f6bd648f0f52795ee0937910d2f90828ce6334aa8a36a"
+  Description = "Dedis-agora node"
+
+
+[[servers]]
+  Address = "tls://5.135.161.91:2000"
+  Suite = "Ed25519"
+  Public = "05536982805a3bc8abae93b843d30fa86b02753cdba1cbce51cebb0380cc0c39"
+  Description = "nikkolasg agora node"
+
+
+[[servers]]
+  Address = "tls://71.19.148.171:9900"
+  Suite = "Ed25519"
+  Public = "24cfadff235b5502997aaeebc94dad5c66d675af7efe069e722063bc646b1871"
+  Description = "agora.nella.org"
+

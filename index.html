@@ -17,11 +17,11 @@
             <h1> Sierra Leone Elections 2018 - Agora results</h1>
             <pre id="title-skipid"></pre>
           </div>
-          <!--<div class="row" id="aggregated-row" style="display: none;">-->
-             <!--<textarea id="aggregated-results" rows="4" cols="50">-->
-            <!--</textarea> -->
-          <!--</div>-->
           <div class="row">
+                <button type="button" class="btn btn-primary">Aggregated results</button> 
+                <button type="button" class="btn btn-primary">Individual results</button> 
+          </div>
+          <div class="row" id="row-aggregated">
               <div class="col-md-6">
             <!--<canvas id="piechart" width="400" height="200"></canvas>-->
                 <div id="piechart" style="border: 1px solid #ccc"> </div>
@@ -31,7 +31,7 @@
               <label for="select-polling">Select list:</label>
               <select class="form-control" id="select-polling"> </select>
           </div>
-                    <div class="row">
+          <div class="row" id="row-individual">
             <table class="table table-inverse" id="results-table">
               <thead>
               </thead>
@@ -52,5 +52,6 @@
     <script src="cothority.js"></script>
     <script src="view.js"></script>
     <script src="main.js"></script>
+    <script src="ethereum/library/verifierLibrary.js"></script>
   </body>
 </html>

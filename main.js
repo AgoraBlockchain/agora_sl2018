@@ -25,9 +25,8 @@ var aggregated = {};
 
 // init page
 $(function() {
-    // Load the Visualization API and the corechart package.
-    google.charts.load('current', {'packages':['corechart']});
-       // show the loading message
+    init();
+    // show the loading message
     var dialog = bootbox.dialog({
         title: 'Agora - Sierra Leone 2018 elections',
         message: '<p><i class="fa fa-spin fa-spinner"></i> Loading and verifying election data...</p>',
@@ -190,4 +189,7 @@ function fetchInfo() {
     return Promise.all([rosterPromise,genesisPromise])
 }
 
-
+function init() {
+    // Load the Visualization API and the corechart package.
+    google.charts.load('current', {'packages':['corechart']});
+}
