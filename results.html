@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!--<link rel="stylesheet" href="main.css">-->
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Agora - Sierra Leone elections 2018</title>
+  </head>
+  <body>
+      <div class="container">
+          <div id="title-row" class="row">
+            <h1> Sierra Leone Elections 2018 - Agora results</h1>
+            <pre id="title-skipid"></pre>
+          </div>
+          <div class="row">
+                <button type="button" class="btn btn-primary">Aggregated results</button> 
+                <button type="button" class="btn btn-primary">Individual results</button> 
+          </div>
+          <div class="row" id="row-aggregated">
+              <div class="col-md-6">
+                <div id="piechart" style="border: 1px solid #ccc"> </div>
+              </div>
+          </div>
+          <div class="row form-group">
+              <label for="select-polling">Select list:</label>
+              <select class="form-control" id="select-polling"> </select>
+          </div>
+          <div class="row" id="row-individual">
+            <table class="table table-inverse" id="results-table">
+              <thead>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+                integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+                crossorigin="anonymous"></script>
+    <!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.3.7/papaparse.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>-->
+ <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> 
+    <script src="bootbox.min.js"></script>
+    <script src="cothority.js"></script>
+    <script src="view.js"></script>
+    <script src="geens/library/lib/library.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>

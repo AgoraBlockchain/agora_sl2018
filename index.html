@@ -1,56 +1,193 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
+
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="title" content="Agora">
+    <meta name="description" content="Swiss Foundation &amp; Lab for Digital Democracy">
+    <title>Agora</title>
 
-    <!--<link rel="stylesheet" href="main.css">-->
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="css/animate.min.css">
+    <link rel="stylesheet" href="css/latofonts.css" type="text/css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Prata">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/style.css?v=2.0" type="text/css">
 
-    <title>Agora - Sierra Leone elections 2018</title>
-  </head>
-  <body>
-      <div class="container">
-          <div id="title-row" class="row">
-            <h1> Sierra Leone Elections 2018 - Agora results</h1>
-            <pre id="title-skipid"></pre>
-          </div>
-          <div class="row">
-                <button type="button" class="btn btn-primary">Aggregated results</button> 
-                <button type="button" class="btn btn-primary">Individual results</button> 
-          </div>
-          <div class="row" id="row-aggregated">
-              <div class="col-md-6">
-                <div id="piechart" style="border: 1px solid #ccc"> </div>
-              </div>
-          </div>
-          <div class="row form-group">
-              <label for="select-polling">Select list:</label>
-              <select class="form-control" id="select-polling"> </select>
-          </div>
-          <div class="row" id="row-individual">
-            <table class="table table-inverse" id="results-table">
-              <thead>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div>
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-                integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-                crossorigin="anonymous"></script>
-    <!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.3.7/papaparse.js"></script>
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>-->
- <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> 
-    <script src="bootbox.min.js"></script>
-    <script src="cothority.js"></script>
-    <script src="view.js"></script>
-    <script src="geens/library/lib/library.js"></script>
-    <script src="main.js"></script>
-  </body>
-</html>
+    <!-- JS -->
+    <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/wow.min.js"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114231134-1"></script>
+    <script type="text/javascript" src="js/gtag.js"></script>
+
+    <script type="text/javascript" src="js/load.js?v=1.3"></script>
+
+</head>
+
+<body>
+
+    <!-- FULL BODY CONTAINER -->
+    <div class="container-fluid">
+
+        <!-- MAIN SECTION -->
+        <section id="main">
+
+            <div class="container-fluid">
+
+                <div class="row" style="background: salmon">
+                    <div class="col col-12">
+
+
+
+                        <div class="row">
+                            <div class="col col-12 text-center">
+                                <div class="pt-4"></div>
+                                <img class="sierra-leone-flag" src="img/sierra-leone-flag.svg">
+                                <div class="pt-4"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-12 text-center">
+                                <h1>
+                                    Sierra Leone Presidential Elections<br>West District Results
+                                </h1>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-12 text-center">
+                                <div class="p-2"></div>
+                                <h2>
+                                    March 7th, 2018
+                                </h2>
+                                <div class="p-100px"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-12 col-md-4 offset-md-1">
+                                <h2>
+                                    Sierra Leone’s National Electoral Commission introduces Africa’s <span style="font-style: italic">first ever blockchain elections</span> in collaboration with the Swiss start-up Agora.
+                                </h2>
+                                <div class="pt-3"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-12 col-md-4 offset-md-7">
+                                <h2>
+                                    Results of the West District were recorded on an <span style="font-style: italic">unforgeable ledger</span> and are displayed here publicly.
+                                </h2>
+                                <div class="pt-3"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-12 col-md-4 offset-md-1">
+                                <h2>
+                                    Safe storage of election data and public accessibility is opening a new age for voter confidence and democracy itself in Sierra Leone and in the rest of world.
+                                </h2>
+                                <div class="pt-3"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-12">
+                                <div class="p-100px"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-12 text-center">
+                                <svg id="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150" stroke-miterlimit="10" stroke-width="1.6" stroke="#9D162E">
+                            <ellipse transform="matrix(0.5658 -0.8245 0.8245 0.5658 -29.2756 94.4063)" fill-opacity="0.0" stroke-miterlimit="10" cx="75" cy="75" rx="57.6" ry="57.6"/>
+                            <line x1="42.4" y1="122.5" x2="107.6" y2="27.5"/>
+                            <line x1="92.9" y1="48.9" x2="128.3" y2="97"/>
+                            <line x1="90" y1="53.1" x2="125.9" y2="102"/>
+                            <line x1="87.1" y1="57.3" x2="123.2" y2="106.5"/>
+                            <line x1="84.2" y1="61.6" x2="120.3" y2="110.7"/>
+                            <line x1="81.5" y1="66" x2="117" y2="114.4"/>
+                            <line x1="78.4" y1="70" x2="113.5" y2="117.9"/>
+                            <line x1="75.5" y1="74.3" x2="109.8" y2="120.9"/>
+                        </svg>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-12">
+                                <div class="p-4"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-8 offset-2 text-center" style="background: salmon;">
+                                <div class="p-2"></div>
+                                <h2>
+                                    Agora is a Swiss foundation providing decentralised digital voting systems based on the blockchain technology. Agora’s solution will enable secure and remote voting from digital devices, as well as allow each voter to verify his or her untampered vote in the final count.
+                                </h2>
+                                <div class="pt-4"></div>
+                                <h2>
+                                    <a href="https://agora.vote">Learn more</a> about the next generation of free and fair elections.
+                                </h2>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-12">
+                                <div class="p-4"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-12 text-center" style="background: gray;">
+                                <h1>
+                                    West District election results
+                                </h1>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-12">
+                                <div class="p-4"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-12" style="background: gray; height: 56px;">
+                                <a href="results.html">
+                                    <div class="access-c">
+                                        <h2 class="color-black access-t">Access</h2>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="line vl main-l1 d-none d-md-inline" style="background: black;">
+                            <div class="fill wow slideInDown" data-wow-duration="10s"></div>
+                        </div>
+                        <div class="line vl main-l2 d-none d-md-inline" style="background: black;">
+                            <div class="fill wow slideInDown" data-wow-duration="10s"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col col-12">
+                        <div class="p-200px"></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</body>
