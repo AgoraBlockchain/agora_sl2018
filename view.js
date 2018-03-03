@@ -1,9 +1,37 @@
+// fillPage takes care of filling the page with the data, the fields and the
+// aggregated data
+function fillPage(data,fields,agg) {
+    fillSelect(data,fields);
+    // fill the table
+    fillHeaders(fields);
+    fillTable(data,fields);
+    // fill the aggregated data
+    fillAggregated(agg);
+    hideWaitingDialog();
+}
+
 // fillSelect takes a list of names to put in the selection and a callback
 // associated with each. The callback must be a function such as:
 // function(name) { ... }
 // the default will be the first name given
-function fillSelect(names,callback) {
+function fillSelect(data,fields) {
+    // selectCallback is called whenever a selection changes from the drop down
+    // list of polling station names
+    const callback = function(event) {
+        const selection = $("select option:selected").text();
+        if (selection === selectKeyAll) {
+            fillTable(data,fields);
+            return
+        }
+        const key = fields[0];
+        const filtered = data.filter(dict => dict[key] === selection);
+        fillTable(filtered,fields);
+
+    }
+    // list of all polling station names
+    const names = [selectKeyAll].concat(data.map(entry => entry[fields[0]]));
     const select = $("#select-polling");
+    select.remove("option");
     names.forEach((name,idx) => {
         const opt = $("<option></option>")
             .text(name)
@@ -46,7 +74,7 @@ function fillTable(data,keys) {
     $("#results-table tbody tr").remove();
     // first set up the table columns according to the first entry
     for(var i = 0; i < data.length; i++) {
-        console.log("Appending row["+i+"] = ",data[i]);
+        //console.log("Appending row["+i+"] = ",data[i]);
         appendRow(keys,data[i]);
     }
 }
@@ -80,4 +108,21 @@ function displayInfo(roster,genesisID) {
 }
 
 
+function initView() {
+    showWaitingDialog();
+}
 
+// XXX NOT WORKING FOR THE MOMENT
+var dialog = null;
+var callBack;
+// showWaitingDialog shos the dialog with some waiting information
+function showWaitingDialog() {
+    callBack = function() {
+    }
+}
+
+// hideWaitingDialog hides the dialog with a timeout of 70ms because it can't be
+// too fast
+function hideWaitingDialog() {
+    //callBack();
+}

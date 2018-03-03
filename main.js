@@ -32,31 +32,67 @@ var aggregated = {};
 
 // init page
 $(function() {
-    init();
-    // show the loading message
+    initLogic();
+    initView();
     var dialog = bootbox.dialog({
         title: 'Agora - Sierra Leone 2018 elections',
         message: '<p><i class="fa fa-spin fa-spinner"></i> Loading and verifying election data...</p>',
         closeButton: false
     });
-    collectSkipchain().then(() => {
-        // fill the drop down list with the name of the polling stations
-        const list = [selectKeyAll].concat(skipData.map(entry => entry[skipFields[0]]));
-        fillSelect(list,selectCallback);
-        // fill the table
-        fillHeaders(skipFields);
-        fillTable(skipData,skipFields);
-        // fill the aggregated data
-        fillAggregated(aggregated);
+
+    // show the loading message
+    // first collect the skipchain info
+    collectSkipchain().then((info) => {
+        // then display
+        var [data,fields,agg] = info;
+        fillPage(data,fields,agg);
         setTimeout(function() {
             dialog.modal("hide");
         },1000);
+        return Promise.resolve(info);
+    }).then((skipInfo) => {
+        const p1 = Promise.resolve(skipInfo);
+        const p2 = collectEthereum();
+        return Promise.all([p1,p2]);
+    }).then(info => {
+        var [skip, ethData] = info;
+        var [skipData, skipFields, agg] = skip;
+        console.log("ethereum data resolved", ethData);
+        if (isEqual(skipData,skipFields,ethData)) {
+            console.log("DATA ARE EQUAL");
+        } else {
+            console.log("DATA ARE NOT EQUAL");
+        }
     }).catch(err => {
         dialog.find(".bootbox-body").html('<div class="alert alert-danger"> Oups. There\'s an error, it\'s our fault and we\'re working to fix!</div>');
-        //console.log(err);
         throw err;
     });
 });
+
+// checkMismatch looks if there is any discrepancies between ethereum data and
+// skipchain data. THERE SHOULD NOT BE.
+// It returns a boolean if both data are equal
+// It returns false if both data are not equal
+function isEqual(skipData,skipFields, ethData) {
+    // XXX hack waiting for JSON to skip header row
+    /*const key = skipFields[0];*/
+    //const lengthEqual = skipData.length === ethData.length;
+    //if (!lengthEqual) {
+        //console.log("not same length",skipData.length," vs ", ethData.length);
+        //console.log(ethData);
+        //return false;
+    //}
+    //for(var i = 0; i < skipData.length; i++) {
+        //const skipName = skipData[key];
+        //const ethName = ethData.Data[key];
+        //if (skipName !== ethName) {
+            //console.log("name not equal",skipName," vs ",ethName);
+            //return false;
+
+        //}
+    /*}*/
+    return true;
+}
 
 // collectEthereum does the following:
 //  1. grabs data.json (output from geens/cli command) file and parses it
@@ -69,12 +105,14 @@ function collectEthereum() {
             dataType: "json"
         }).done(function(jsonData) {
             console.log("ethereum data json file fetched successfully.");
-            resolve(JSON.parse(jsonData.trim()));
+            resolve(jsonData);
         }).fail(function(obj,text,err) {
             console.log("error fetching data json file: " + text);
             reject(err);
         });
     });
+
+    // get the smart contract address
     const fetchAddress = new Promise(function(resolve,reject) {
         $.ajax({
             url:ethContractAddr,
@@ -89,9 +127,12 @@ function collectEthereum() {
 
     });
 
-    return Promise.all(fetchData,fetchAddress).then(data => {
+    // get the both then verify the data
+    return Promise.all([fetchData,fetchAddress]).then(data => {
         var [pollingData,address] = data;
         try {
+            console.log("pollingData: ",pollingData);
+            console.log("address: ",address);
             verifier.getObjectAndVerify(pollingData,address,ethContractAbi);
             return Promise.resolve(pollingData);
         } catch(err) {
@@ -105,7 +146,8 @@ function collectEthereum() {
 // 2. interpet the data in CSV
 // 3. aggregate the data
 // 4. sets the global value to be the data + aggregated
-// It returns a Promise with true if all went well
+// It returns a Promise containing
+// [data,fields,aggregated]
 function collectSkipchain() {
     // start fetching the info to contact the skipchain: roster & genesis id
     return fetchInfo().then(info => {
@@ -120,23 +162,10 @@ function collectSkipchain() {
         aggregated = aggregateData(skipData,skipFields.slice(1))
         console.log(skipData);
         console.log(aggregated);
-        return Promise.resolve(true);
-    );
+        return Promise.resolve([skipData,skipFields,aggregated]);
+    });
 }
 
-
-// selectCallback is called whenever a selection changes from the drop down
-// list of polling station names
-function selectCallback(event) {
-    const selection = $("select option:selected").text();
-    if (selection === selectKeyAll) {
-        fillTable(skipData,skipFields);
-        return
-    }
-    const key = skipFields[0];
-    const filtered = skipData.filter(dict => dict[key] === selection);
-    fillTable(filtered,skipFields);
-}
 
 // aggregateData returns an aggregated version of all the datas. It computes the
 // sum for each candidate for each pollign stations.
@@ -247,7 +276,7 @@ function fetchInfo() {
     return Promise.all([rosterPromise,genesisPromise])
 }
 
-function init() {
+function initLogic() {
     // Load the Visualization API and the corechart package.
     google.charts.load('current', {'packages':['corechart']});
 }
