@@ -68,7 +68,7 @@ $(function() {
     }).then(info => {
         var [skip, ethData] = info;
         var [skipData, skipFields, agg] = skip;
-        console.log("ethereum data resolved", ethData);
+        console.log("ethereum data resolved");
         if (isEqual(skipData,skipFields,ethData)) {
             console.log("DATA ARE EQUAL");
         } else {
@@ -89,17 +89,16 @@ function isEqual(skipData,skipFields, ethData) {
     const lengthEqual = skipData.length === ethData.length;
     if (!lengthEqual) {
         console.log("not same length",skipData.length," vs ", ethData.length);
-        console.log(ethData);
+        //console.log(ethData);
         return false;
     }
-    console.log("isEqual eth data",ethData);
+    //console.log("isEqual eth data",ethData);
     for(var i = 0; i < skipData.length; i++) {
         const skipName = skipData[i][key];
         const ethName = ethData[i].Data[0];
         if (skipName !== ethName) {
             console.log("name not equal",skipName," vs ",ethName);
             return false;
-
         }
     }
     return true;
@@ -113,7 +112,8 @@ function collectEthereum() {
     const fetchData = new Promise(function(resolve,reject) {
         $.ajax({
             url:ethDataJson,
-            dataType: "json"
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
         }).done(function(jsonData) {
             console.log("ethereum data json file fetched successfully.");
             resolve(jsonData);
@@ -127,7 +127,8 @@ function collectEthereum() {
     const fetchAddress = new Promise(function(resolve,reject) {
         $.ajax({
             url:ethContractAddr,
-            dataType: "text"
+            dataType: "text",
+            contentType: "text/plain",
         }).done(function(address) {
             console.log("ethereum contract address fetched successfully.",address);
             resolve(address.trim());
@@ -141,8 +142,8 @@ function collectEthereum() {
     // get the both then verify the data
     return Promise.all([fetchData,fetchAddress]).then(data => {
         var [pollingData,address] = data;
-        console.log("pollingData: ",pollingData);
-        console.log("address: ",address);
+        //console.log("pollingData: ",pollingData);
+        //console.log("address: ",address);
         const dataPromise = Promise.resolve(pollingData);
         const ethPromise = verifier.getObjectAndVerify(pollingData,address,ethContractAbi);
         return Promise.all([dataPromise,ethPromise]);
@@ -171,8 +172,8 @@ function collectSkipchain() {
         skipData = csvParsed.data;
         skipFields = csvParsed.meta.fields;
         aggregated = aggregateData(skipData,skipFields.slice(1))
-        console.log(skipData);
-        console.log(aggregated);
+        //console.log(skipData);
+        //console.log(aggregated);
         return Promise.resolve([skipData,skipFields,aggregated]);
     });
 }
@@ -221,7 +222,7 @@ function fetchData(rosterTOML,genesisID) {
 function processCiscStorage(storage) {
     const csv = storage[dataKey()];
     if ((csv === undefined) || (csv == "")) {
-        console.log(storage);
+        //console.log(storage);
         throw new Error("there is no data associated with " + dataKey());
     }
 
@@ -261,7 +262,8 @@ function fetchInfo() {
     const rosterPromise = new Promise(function(resolve,reject) {
         $.ajax({
             url: rosterURL,
-            dataType: "text"
+            dataType: "text",
+            contentType: "text/plain",
         }).done(function(roster) {
                 console.log("roster fetched sucesfully: " + roster);
                 resolve(roster.trim());
@@ -274,7 +276,10 @@ function fetchInfo() {
     const genesisPromise = new Promise(function(resolve,reject) {
         $.ajax({
             url:genesisURL,
-            dataType: "text"
+            dataType: "text",
+            contentType: "text/plain",
+        }).done(function(roster) {
+
         }).done(function(genesis) {
             console.log("genesis id fetched successfully: " + genesis);
             resolve(genesis.trim());
