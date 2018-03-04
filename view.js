@@ -63,7 +63,6 @@ function fillAggregated(aggregated) {
         chart.draw(data, options);
 
     }
-
     // Set a callback to run when the Google Visualization API is loaded.
     google.charts.setOnLoadCallback(drawChart);
 }

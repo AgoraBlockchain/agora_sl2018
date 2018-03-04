@@ -74,23 +74,23 @@ $(function() {
 // It returns a boolean if both data are equal
 // It returns false if both data are not equal
 function isEqual(skipData,skipFields, ethData) {
-    // XXX hack waiting for JSON to skip header row
-    /*const key = skipFields[0];*/
-    //const lengthEqual = skipData.length === ethData.length;
-    //if (!lengthEqual) {
-        //console.log("not same length",skipData.length," vs ", ethData.length);
-        //console.log(ethData);
-        //return false;
-    //}
-    //for(var i = 0; i < skipData.length; i++) {
-        //const skipName = skipData[key];
-        //const ethName = ethData.Data[key];
-        //if (skipName !== ethName) {
-            //console.log("name not equal",skipName," vs ",ethName);
-            //return false;
+    const key = skipFields[0];
+    const lengthEqual = skipData.length === ethData.length;
+    if (!lengthEqual) {
+        console.log("not same length",skipData.length," vs ", ethData.length);
+        console.log(ethData);
+        return false;
+    }
+    console.log("isEqual eth data",ethData);
+    for(var i = 0; i < skipData.length; i++) {
+        const skipName = skipData[i][key];
+        const ethName = ethData[i].Data[0];
+        if (skipName !== ethName) {
+            console.log("name not equal",skipName," vs ",ethName);
+            return false;
 
-        //}
-    /*}*/
+        }
+    }
     return true;
 }
 
@@ -130,15 +130,15 @@ function collectEthereum() {
     // get the both then verify the data
     return Promise.all([fetchData,fetchAddress]).then(data => {
         var [pollingData,address] = data;
-        try {
-            console.log("pollingData: ",pollingData);
-            console.log("address: ",address);
-            verifier.getObjectAndVerify(pollingData,address,ethContractAbi);
-            return Promise.resolve(pollingData);
-        } catch(err) {
-            return Promise.reject(err);
-        }
-    });
+        console.log("pollingData: ",pollingData);
+        console.log("address: ",address);
+        const dataPromise = Promise.resolve(pollingData);
+        const ethPromise = verifier.getObjectAndVerify(pollingData,address,ethContractAbi);
+        return Promise.all([dataPromise,ethPromise]);
+        }).then((info) => {
+            var [data,hash] = info;
+            return Promise.resolve(data);
+        });
 }
 
 // collectSkipchain does the following:

@@ -18,3 +18,4 @@ cisc kv file "$csv" --key "$key"
 # add to ethereum
 cd geens/cli
 node index "$csv"
+cp data.json ../../data.json
