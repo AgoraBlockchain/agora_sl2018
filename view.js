@@ -3,13 +3,27 @@
 function fillPage(data,fields,agg) {
     fillSelect(data,fields);
     // fill the table
-    fillHeaders(fields);
-    fillTable(data,fields);
+    var [prunedData,prunedFields] = prune(data,fields);
+    fillHeaders(prunedFields);
+    fillTable(prunedData,prunedFields);
     // fill the aggregated data
     fillAggregated(agg);
     hideWaitingDialog();
 }
 
+// remove the first entry of each since it's polling station data
+function prune(data,fields) {
+    const toPrune = fields[0];
+    const prunedFields = fields.slice(1);
+    const prunedData = data.map(row => {
+        // take only the value for the pruned fields
+        return prunedFields.reduce((acc,f) => {
+            acc[f] = row[f];
+            return acc;
+        },{});
+    });
+    return [prunedData,prunedFields];
+}
 // fillSelect takes a list of names to put in the selection and a callback
 // associated with each. The callback must be a function such as:
 // function(name) { ... }
@@ -25,7 +39,8 @@ function fillSelect(data,fields) {
         }
         const key = fields[0];
         const filtered = data.filter(dict => dict[key] === selection);
-        fillTable(filtered,fields);
+        var [prunedData,prunedFields] = prune(filtered,fields);
+        fillTable(prunedData,prunedFields);
 
     }
     // list of all polling station names
@@ -43,26 +58,40 @@ function fillSelect(data,fields) {
     select.change(callback);
 }
 
+const staticColors = ['#e0440e', '#e6693e', '#ec8f6e', '#f3b49f', '#f6c7b6'];
 
 // fill the aggregated textarea => TO CHANGE with a nice graph
 function fillAggregated(aggregated) {
     const rows = Object.keys(aggregated).map(key => [key,aggregated[key]]);
+    const selectedColors = rows.map((v,i) => staticColors[i]);
+      /*  var n = 18;*/
+        //for(var i =0; i < n;i++) {
+            //rows.push(["candidat"+i,i*8]);
+        //}
+
     const drawChart = function() {
         // create the data table.
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Candidate');
         data.addColumn('number', 'Votes');
         data.addRows(rows);
+
         // set chart options
-        var options = {'title':titleChart,
-                       'width':500,
-                       'height':300};
+        var options = {'title':"",
+            sliceVisibilityThreshold: 0.000005,
+            pieResidueSliceLabel: "Other",
+            chartArea: {left: 0, top: 0, width: "100%", height: "100%"},
+            colors: selectedColors,
+        };
 
         // instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('piechart'));
         chart.draw(data, options);
-
     }
+
+    $(window).resize(function(){
+      drawChart();
+    });
     // Set a callback to run when the Google Visualization API is loaded.
     google.charts.setOnLoadCallback(drawChart);
 }
@@ -71,7 +100,7 @@ function fillAggregated(aggregated) {
 // array as one line in the table.
 function fillTable(data,keys) {
     $("#results-table tbody tr").remove();
-    // first set up the table columns according to the first entry
+        // set up the table columns according to the first entry
     for(var i = 0; i < data.length; i++) {
         //console.log("Appending row["+i+"] = ",data[i]);
         appendRow(keys,data[i]);
@@ -102,9 +131,9 @@ function fillHeaders(keys) {
 
 // displayInfo writes some info about the roster and the skipchain id the page
 // is using
-function displayInfo(roster,genesisID) {
-    $("#title-skipid").text("skipchain ID: " + genesisID);
-}
+//function displayInfo(roster,genesisID) {
+//    $("#title-skipid").text("skipchain ID: " + genesisID);
+//}
 
 
 function initView() {
