@@ -1,13 +1,31 @@
+// colors to use to decorate the chart and the table
+const staticColors = ['#e0440e', '#e6693e', '#ec8f6e', '#f3b49f', '#f6c7b6'];
+
 // fillPage takes care of filling the page with the data, the fields and the
 // aggregated data
 function fillPage(data,fields,agg) {
     fillSelect(data,fields);
     // fill the table
-    fillHeaders(fields);
-    fillTable(data,fields);
+    var [prunedData,prunedFields] = prune(data,fields);
+    fillHeaders(prunedFields);
+    fillTable(prunedData,prunedFields);
     // fill the aggregated data
     fillAggregated(agg);
     hideWaitingDialog();
+}
+
+// remove the first entry of each since it's polling station data
+function prune(data,fields) {
+    const toPrune = fields[0];
+    const prunedFields = fields.slice(1);
+    const prunedData = data.map(row => {
+        // take only the value for the pruned fields
+        return prunedFields.reduce((acc,f) => {
+            acc[f] = row[f];
+            return acc;
+        },{});
+    });
+    return [prunedData,prunedFields];
 }
 
 // fillSelect takes a list of names to put in the selection and a callback
@@ -25,7 +43,8 @@ function fillSelect(data,fields) {
         }
         const key = fields[0];
         const filtered = data.filter(dict => dict[key] === selection);
-        fillTable(filtered,fields);
+        var [prunedData,prunedFields] = prune(filtered,fields);
+        fillTable(prunedData,prunedFields);
 
     }
     // list of all polling station names
@@ -33,8 +52,8 @@ function fillSelect(data,fields) {
     const select = $("#select-polling");
     select.remove("option");
     names.forEach((name,idx) => {
-        const opt = $("<option></option>")
-            .text(name)
+        const html = '<div class="selection">'+name+'</div>';
+        const opt = $("<option></option>").html(html);
         if (idx == 0)
             opt.attr("selected",true)
 
@@ -43,14 +62,21 @@ function fillSelect(data,fields) {
     select.change(callback);
 }
 
+
+// fieldsToColors makes a deterministic mapping from a field name to a color
+// the same color is used to draw the table and the chart
+function fieldsToColors(fields) {
+    return fields.map((v,i) => staticColors[i]);
+}
 // fill the aggregated textarea => TO CHANGE with a nice graph
 function fillAggregated(aggregated) {
     const rows = Object.keys(aggregated).map(key => [key,aggregated[key]]);
+    const selectedColors = fieldsToColors(rows);
         var n = 18;
         for(var i =0; i < n;i++) {
             rows.push(["candidat"+i,i*8]);
         }
-    
+
     const drawChart = function() {
         // create the data table.
         var data = new google.visualization.DataTable();
@@ -61,6 +87,7 @@ function fillAggregated(aggregated) {
         // set chart options
         var options = {'title':"",
                        backgroundColor: { fill:'transparent' },
+            colors: selectedColors,
                        sliceVisibilityThreshold: 0.0000002,
                        pieResidueSliceLabel: "Other",
             chartArea: {left: 0, top: 100, width: "100%", height: "50%"}
@@ -69,13 +96,11 @@ function fillAggregated(aggregated) {
         // instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('piechart'));
         chart.draw(data, options);
-
     }
 
-$(window).resize(function(){
-  drawChart();
-});
-
+    $(window).resize(function(){
+      drawChart();
+    });
     // Set a callback to run when the Google Visualization API is loaded.
     google.charts.setOnLoadCallback(drawChart);
 }
@@ -84,7 +109,7 @@ $(window).resize(function(){
 // array as one line in the table.
 function fillTable(data,keys) {
     $("#results-table tbody tr").remove();
-    // first set up the table columns according to the first entry
+        // set up the table columns according to the first entry
     for(var i = 0; i < data.length; i++) {
         //console.log("Appending row["+i+"] = ",data[i]);
         appendRow(keys,data[i]);
@@ -95,23 +120,37 @@ function fillTable(data,keys) {
 // keys specified.
 function appendRow(keys,row) {
     const tr = $("<tr></tr>");
+    const getDiv = function(text) {
+        return '<div class="vote">'+text+'</div>';
+    }
     for(var i = 0; i < keys.length; i++) {
         const key = keys[i];
         var text = row[key];
         if (text === undefined) text = "";
-        $("<td></td>").text(text).appendTo(tr);
+        $("<td></td>").html(getDiv(text)).appendTo(tr);
     }
     $("#results-table tbody").append(tr);
 }
 
 // fillHeaders fills up the header table columns
-function fillHeaders(keys) {
+function fillHeaders(fields) {
     const tr = $('<tr></tr>').attr({ class: ["class2", "class3"].join(' ') });
-    for(var i = 0; i < keys.length; i++) {
-        const th = $('<th></th>').text(keys[i]).attr({scope:"col"}).appendTo(tr);
+    const selectedColors = fieldsToColors(fields);
+    // returns the HTML that is put for one field and color
+    const htmlTh = function(i) {
+        const field = fields[i];
+        const color = selectedColors[i];
+        return '<div class="candidate-color" style="background:' + color +
+            ';"></div><div class="candidate-name">'+field+'</div>';
+    };
+
+    for(var i = 0; i < fields.length; i++) {
+        //const th = $('<th></th>').text([i]).attr({class:"candidate",scope:"col"}).appendTo(tr);
+        const th = $('<th></th>').html(htmlTh(i)).attr({class:"candidate",scope:"col"}).appendTo(tr);
     }
     $("#results-table thead").append(tr);
 }
+
 
 // displayInfo writes some info about the roster and the skipchain id the page
 // is using
