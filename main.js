@@ -34,11 +34,11 @@ var aggregated = {};
 $(function() {
     initLogic();
     initView();
-    var dialog = bootbox.dialog({
+    /*var dialog = bootbox.dialog({
         title: 'Agora - Sierra Leone 2018 elections',
         message: '<p><i class="fa fa-spin fa-spinner"></i> Loading and verifying election data...</p>',
         closeButton: false
-    });
+    });*/
 
     // show the loading message
     // first collect the skipchain info
@@ -46,9 +46,20 @@ $(function() {
         // then display
         var [data,fields,agg] = info;
         fillPage(data,fields,agg);
-        setTimeout(function() {
+        /*setTimeout(function() {
             dialog.modal("hide");
-        },1000);
+        },1000);*/
+        
+    //loading overlay
+    setTimeout(
+        function () {
+            $('#loading-overlay').css({
+                'visibility': 'hidden',
+                'opacity': '0'
+            });
+            $('body,html').css('overflow','visible');
+        }, 50);
+        
         return Promise.resolve(info);
     }).then((skipInfo) => {
         const p1 = Promise.resolve(skipInfo);
@@ -152,7 +163,7 @@ function collectSkipchain() {
     // start fetching the info to contact the skipchain: roster & genesis id
     return fetchInfo().then(info => {
         var [roster,genesisID] = info;
-        displayInfo(roster,genesisID);
+        //displayInfo(roster,genesisID);
         // fetch the data from the roster on the given skipchain id
         //return fetchDataFake(roster,genesisID);
         return fetchData(roster,genesisID);

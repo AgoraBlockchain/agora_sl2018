@@ -43,26 +43,37 @@ function fillSelect(data,fields) {
     select.change(callback);
 }
 
-
 // fill the aggregated textarea => TO CHANGE with a nice graph
 function fillAggregated(aggregated) {
     const rows = Object.keys(aggregated).map(key => [key,aggregated[key]]);
+        var n = 18;
+        for(var i =0; i < n;i++) {
+            rows.push(["candidat"+i,i*8]);
+        }
+    
     const drawChart = function() {
         // create the data table.
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Candidate');
         data.addColumn('number', 'Votes');
         data.addRows(rows);
+
         // set chart options
-        var options = {'title':titleChart,
-                       'width':500,
-                       'height':300};
+        var options = {'title':"",
+                       sliceVisibilityThreshold: 0.000005,
+                       pieResidueSliceLabel: "Other",
+            chartArea: {left: 0, top: 0, width: "100%", height: "100%"}
+                      };
 
         // instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('piechart'));
         chart.draw(data, options);
 
     }
+
+$(window).resize(function(){
+  drawChart();
+});
 
     // Set a callback to run when the Google Visualization API is loaded.
     google.charts.setOnLoadCallback(drawChart);
@@ -103,9 +114,9 @@ function fillHeaders(keys) {
 
 // displayInfo writes some info about the roster and the skipchain id the page
 // is using
-function displayInfo(roster,genesisID) {
-    $("#title-skipid").text("skipchain ID: " + genesisID);
-}
+//function displayInfo(roster,genesisID) {
+//    $("#title-skipid").text("skipchain ID: " + genesisID);
+//}
 
 
 function initView() {

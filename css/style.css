@@ -56,6 +56,8 @@ body {
     margin: 0px;
     background-color: var(--color-white);
     color: var(--color-black);
+    
+    overflow: hidden;
 }
 
 .container-fluid {
@@ -167,22 +169,15 @@ h3 {
     display: inline-block;
     position: relative;
     z-index: 5;
-    font-family: 'LatoWebThin';
-    font-size: 22px;
-    line-height: 28px;
+    font-family: 'LatoWebLight';
+    font-size: 14px;
+    line-height: 22px;
 }
 
 @media (min-width:768px) {
     h3 {
-        font-size: 20px;
-        line-height: 26px;
-    }
-}
-
-@media (min-width:1200px) {
-    h3 {
-        font-size: 30px;
-        line-height: 36px;
+        font-size: 16px;
+        line-height: 24px;
     }
 }
 
@@ -251,6 +246,82 @@ h7 {
     h6 {
         font-size: 18px;
     }
+}
+
+/*LOADING OVERLAY*/
+
+#loading-overlay {
+    background-color: var(--color-white);
+    transition: opacity 1s, visibility 0s 1s;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    z-index: 20000;
+    top: 0;
+    left: 0;
+}
+
+/* css for spin eg. 2 */
+
+.loading-t {
+    position: absolute;
+    top: calc(50% + 50px);
+    left: calc(50% - 128px);
+}
+.circle {
+    position: absolute;
+    top: calc(50% - 25px);
+    left: calc(50% - 25px);
+	background-color: rgba(0,0,0,0);
+	border:5px solid rgba(0,183,229,0.9);
+	opacity:.9;
+	border-right:5px solid rgba(0,0,0,0);
+	border-left:5px solid rgba(0,0,0,0);
+	border-radius:50px;
+	box-shadow: 0 0 35px #2187e7;
+	width:50px;
+	height:50px;
+	-moz-animation:spinPulse 2s infinite ease-in-out;
+	-webkit-animation:spinPulse 2s infinite linear;
+}
+.circle1 {
+    position: absolute;
+    top: calc(50% - 15px);
+    left: calc(50% - 15px);
+	background-color: rgba(0,0,0,0);
+	border:5px solid rgba(0,183,229,0.9);
+	opacity:.9;
+	border-left:5px solid rgba(0,0,0,0);
+	border-right:5px solid rgba(0,0,0,0);
+	border-radius:50px;
+	box-shadow: 0 0 15px #2187e7; 
+	width:30px;
+	height:30px;
+	-moz-animation:spinoffPulse 1s infinite linear;
+	-webkit-animation:spinoffPulse 1s infinite linear;
+}
+@-moz-keyframes spinPulse {
+	0% { -moz-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7;}
+	50% { -moz-transform:rotate(145deg); opacity:1; }
+	100% { -moz-transform:rotate(-320deg); opacity:0; }
+}
+@-moz-keyframes spinoffPulse {
+	0% { -moz-transform:rotate(0deg); }
+	100% { -moz-transform:rotate(360deg);  }
+}
+@-webkit-keyframes spinPulse {
+	0% { -webkit-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7; }
+	50% { -webkit-transform:rotate(145deg); opacity:1;}
+	100% { -webkit-transform:rotate(-320deg); opacity:0; }
+}
+@-webkit-keyframes spinoffPulse {
+	0% { -webkit-transform:rotate(0deg); }
+	100% { -webkit-transform:rotate(360deg); }
+}
+
+#piechart {
+  width: 100%; 
+  min-height: 700px;
 }
 
 /*SECTIONS*/
