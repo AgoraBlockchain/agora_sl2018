@@ -4,13 +4,13 @@ const staticColors = ['#e0440e', '#e6693e', '#ec8f6e', '#f3b49f', '#f6c7b6'];
 // fillPage takes care of filling the page with the data, the fields and the
 // aggregated data
 function fillPage(data,fields,agg) {
-    fillSelect(data,fields);
+    // fill the aggregated data pie chart
+    fillAggregated(agg);
+    // fill select list
+    fillSelect(data,fields,agg);
     // fill the table
     var [prunedData,prunedFields] = prune(data,fields);
-    fillHeaders(prunedFields);
-    fillTable(prunedData,prunedFields);
-    // fill the aggregated data
-    fillAggregated(agg);
+    fillTable(prunedData,prunedFields,agg);
     hideWaitingDialog();
 }
 
@@ -32,23 +32,25 @@ function prune(data,fields) {
 // associated with each. The callback must be a function such as:
 // function(name) { ... }
 // the default will be the first name given
-function fillSelect(data,fields) {
+function fillSelect(data,fields,agg) {
     // selectCallback is called whenever a selection changes from the drop down
     // list of polling station names
     const callback = function(event) {
         const selection = $("select option:selected").text();
         if (selection === selectKeyAll) {
-            fillTable(data,fields);
+            // do not show the polling station column
+            fillTable(data,fields.slice(1),agg);
             return
         }
         const key = fields[0];
         const filtered = data.filter(dict => dict[key] === selection);
         var [prunedData,prunedFields] = prune(filtered,fields);
-        fillTable(prunedData,prunedFields);
+        fillTable(prunedData,prunedFields,agg);
 
     }
     // list of all polling station names
     const names = [selectKeyAll].concat(data.map(entry => entry[fields[0]]));
+    //const names = data.map(entry => entry[fields[0]]);
     const select = $("#select-polling");
     select.remove("option");
     names.forEach((name,idx) => {
@@ -70,7 +72,18 @@ function fieldsToColors(fields) {
 }
 // fill the aggregated textarea => TO CHANGE with a nice graph
 function fillAggregated(aggregated) {
-    const rows = Object.keys(aggregated).map(key => [key,aggregated[key]]);
+    // sort by vote
+    const rows = Object.keys(aggregated).map(key => [key.trim(),aggregated[key]])
+        .sort(function(a,b) {
+            if (a[1] < b[1]) {
+                return  1;
+            }
+            if (a[1] > b[1]) {
+                return -1;
+            }
+            return 0;
+        });
+    console.log("SORTED DATA",rows);
     const selectedColors = fieldsToColors(rows);
         var n = 18;
         for(var i =0; i < n;i++) {
@@ -107,12 +120,40 @@ function fillAggregated(aggregated) {
 
 // fillTable takes the data returned by fetchData and display each object in the
 // array as one line in the table.
-function fillTable(data,keys) {
+function fillTable(data,keys,agg) {
+    // sort by value
+    // if data has more than one row => we show everything in same order as pie
+    // chart
+    // if data has one length, then we just compare numbers
+    var sortedKeys = keys.slice();
+    if (data.length == 1) {
+        sortedKeys = sortedKeys.sort(function(a,b) {
+            var va = data[0][a];
+            var vb = data[0][b];
+            if (va < vb)
+                return 1;
+            if (va > vb)
+                return -1;
+            return 0;
+        });
+    }
+    if (data.length > 1) {
+        sortedKeys = sortedKeys.sort(function(a,b) {
+            var va = agg[a];
+            var vb = agg[b];
+             if (va < vb)
+                return 1;
+            if (va > vb)
+                return -1;
+            return 0;
+        });
+    }
+    fillHeaders(sortedKeys);
     $("#results-table tbody tr").remove();
         // set up the table columns according to the first entry
     for(var i = 0; i < data.length; i++) {
         //console.log("Appending row["+i+"] = ",data[i]);
-        appendRow(keys,data[i]);
+        appendRow(sortedKeys,data[i]);
     }
 }
 
@@ -134,6 +175,7 @@ function appendRow(keys,row) {
 
 // fillHeaders fills up the header table columns
 function fillHeaders(fields) {
+    $("#results-table thead tr").remove();
     const tr = $('<tr></tr>').attr({ class: ["class2", "class3"].join(' ') });
     const selectedColors = fieldsToColors(fields);
     // returns the HTML that is put for one field and color
