@@ -183,9 +183,16 @@ h4 {
     display: inline-block;
     position: relative;
     z-index: 5;
-    font-family: 'LatoWebLight';
-    font-size: 16px;
-    font-style: italic;
+    font-family: 'LatoWeb';
+    font-size: 14px;
+    line-height: 22px;
+}
+
+@media (min-width:768px) {
+    h4 {
+        font-size: 16px;
+        line-height: 24px;
+    }
 }
 
 h5 {

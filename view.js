@@ -183,7 +183,7 @@ function appendRow(keys,row) {
         const key = keys[i];
         var text = row[key];
         if (text === undefined) text = "";
-        $("<td></td>").html(getDiv(text)).appendTo(tr);
+        $("<td class='vote-c'></td>").html(getDiv(text)).appendTo(tr);
     }
     $("#results-table tbody").append(tr);
 }
