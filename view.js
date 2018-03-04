@@ -83,7 +83,6 @@ function fillAggregated(aggregated) {
             }
             return 0;
         });
-    console.log("SORTED DATA",rows);
     const selectedColors = fieldsToColors(rows);
         var n = 18;
         for(var i =0; i < n;i++) {
@@ -152,7 +151,6 @@ function fillTable(data,keys,agg) {
     $("#results-table tbody tr").remove();
         // set up the table columns according to the first entry
     for(var i = 0; i < data.length; i++) {
-        //console.log("Appending row["+i+"] = ",data[i]);
         appendRow(sortedKeys,data[i]);
     }
 }
