@@ -39,12 +39,10 @@ function fillSelect(data,fields,agg) {
     const callback = function(event) {
         const selection = $("select option:selected").text();
         if (selection === selectKeyAll) {
-            console.log("SELECT SELECTION ALL=> ", selection);
             // do not show the polling station column
             fillTableAggregegated(fields.slice(1),agg);
             return
         }
-        console.log("SELECT SELECTION DETAILLED=> ", selection);
         // do not show the polling station column
         const key = fields[0];
         const filtered = data.filter(dict => dict[key] === selection);
