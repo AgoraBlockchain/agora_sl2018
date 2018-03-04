@@ -1,3 +1,6 @@
+// colors to use to decorate the chart and the table
+const staticColors = ['#e0440e', '#e6693e', '#ec8f6e', '#f3b49f', '#f6c7b6'];
+
 // fillPage takes care of filling the page with the data, the fields and the
 // aggregated data
 function fillPage(data,fields,agg) {
@@ -24,6 +27,7 @@ function prune(data,fields) {
     });
     return [prunedData,prunedFields];
 }
+
 // fillSelect takes a list of names to put in the selection and a callback
 // associated with each. The callback must be a function such as:
 // function(name) { ... }
@@ -48,8 +52,8 @@ function fillSelect(data,fields) {
     const select = $("#select-polling");
     select.remove("option");
     names.forEach((name,idx) => {
-        const opt = $("<option></option>")
-            .text(name)
+        const html = '<div class="selection">'+name+'</div>';
+        const opt = $("<option></option>").html(html);
         if (idx == 0)
             opt.attr("selected",true)
 
@@ -58,12 +62,16 @@ function fillSelect(data,fields) {
     select.change(callback);
 }
 
-const staticColors = ['#e0440e', '#e6693e', '#ec8f6e', '#f3b49f', '#f6c7b6'];
 
+// fieldsToColors makes a deterministic mapping from a field name to a color
+// the same color is used to draw the table and the chart
+function fieldsToColors(fields) {
+    return fields.map((v,i) => staticColors[i]);
+}
 // fill the aggregated textarea => TO CHANGE with a nice graph
 function fillAggregated(aggregated) {
     const rows = Object.keys(aggregated).map(key => [key,aggregated[key]]);
-    const selectedColors = rows.map((v,i) => staticColors[i]);
+    const selectedColors = fieldsToColors(rows);
       /*  var n = 18;*/
         //for(var i =0; i < n;i++) {
             //rows.push(["candidat"+i,i*8]);
@@ -111,23 +119,37 @@ function fillTable(data,keys) {
 // keys specified.
 function appendRow(keys,row) {
     const tr = $("<tr></tr>");
+    const getDiv = function(text) {
+        return '<div class="vote">'+text+'</div>';
+    }
     for(var i = 0; i < keys.length; i++) {
         const key = keys[i];
         var text = row[key];
         if (text === undefined) text = "";
-        $("<td></td>").text(text).appendTo(tr);
+        $("<td></td>").html(getDiv(text)).appendTo(tr);
     }
     $("#results-table tbody").append(tr);
 }
 
 // fillHeaders fills up the header table columns
-function fillHeaders(keys) {
+function fillHeaders(fields) {
     const tr = $('<tr></tr>').attr({ class: ["class2", "class3"].join(' ') });
-    for(var i = 0; i < keys.length; i++) {
-        const th = $('<th></th>').text(keys[i]).attr({scope:"col"}).appendTo(tr);
+    const selectedColors = fieldsToColors(fields);
+    // returns the HTML that is put for one field and color
+    const htmlTh = function(i) {
+        const field = fields[i];
+        const color = selectedColors[i];
+        return '<div class="candidate-color" style="background:' + color +
+            ';"></div><div class="candidate-name">'+field+'</div>';
+    };
+
+    for(var i = 0; i < fields.length; i++) {
+        //const th = $('<th></th>').text([i]).attr({class:"candidate",scope:"col"}).appendTo(tr);
+        const th = $('<th></th>').html(htmlTh(i)).attr({class:"candidate",scope:"col"}).appendTo(tr);
     }
     $("#results-table thead").append(tr);
 }
+
 
 // displayInfo writes some info about the roster and the skipchain id the page
 // is using
