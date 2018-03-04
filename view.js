@@ -10,7 +10,8 @@ function fillPage(data,fields,agg) {
     fillSelect(data,fields,agg);
     // fill the table
     var [prunedData,prunedFields] = prune(data,fields);
-    fillTable(prunedData,prunedFields,agg);
+    // show by default the aggregated table
+    fillTableAggregegated(prunedFields,agg);
     hideWaitingDialog();
 }
 
@@ -38,14 +39,17 @@ function fillSelect(data,fields,agg) {
     const callback = function(event) {
         const selection = $("select option:selected").text();
         if (selection === selectKeyAll) {
+            console.log("SELECT SELECTION ALL=> ", selection);
             // do not show the polling station column
-            fillTable(data,fields.slice(1),agg);
+            fillTableAggregegated(fields.slice(1),agg);
             return
         }
+        console.log("SELECT SELECTION DETAILLED=> ", selection);
+        // do not show the polling station column
         const key = fields[0];
         const filtered = data.filter(dict => dict[key] === selection);
         var [prunedData,prunedFields] = prune(filtered,fields);
-        fillTable(prunedData,prunedFields,agg);
+        fillTableDetail(prunedFields,prunedData);
 
     }
     // list of all polling station names
@@ -89,7 +93,7 @@ function fillAggregated(aggregated) {
         }
 
     const selectedColors = fieldsToColors(rows);
-    
+
     const drawChart = function() {
         // create the data table.
         var data = new google.visualization.DataTable();
@@ -136,89 +140,86 @@ function fillAggregated(aggregated) {
 const tableLargeId = "#results-table";
 const tableMobileId = "#results-table-mobile";
 
-// fillTable takes the data returned by fetchData and display each object in the
-// array as one line in the table.
-function fillTable(data,keys,agg) {
-    // sort by value
-    // if data has more than one row => we show everything in same order as pie
-    // chart
-    // if data has one length, then we just compare numbers
-    var sortedKeys = keys.slice();
-    if (data.length == 1) {
-        sortedKeys = sortedKeys.sort(function(a,b) {
-            var va = data[0][a];
-            var vb = data[0][b];
-            if (va < vb)
-                return 1;
-            if (va > vb)
-                return -1;
-            return 0;
-        });
-    }
-    if (data.length > 1) {
-        sortedKeys = sortedKeys.sort(function(a,b) {
-            var va = agg[a];
-            var vb = agg[b];
-             if (va < vb)
-                return 1;
-            if (va > vb)
-                return -1;
-            return 0;
-        });
-    }
-    constructLargeTable(sortedKeys,data);
-    constructMobileTable(sortedKeys,data);
+// fillTableDetail constructs the detailled table
+function fillTableDetail(keys,data) {
+    const sortedKeys = keys.slice();
+    sortedKeys.sort(function(a,b) {
+        var va = data[0][a];
+        var vb = data[0][b];
+        if (va < vb)
+            return 1;
+        if (va > vb)
+            return -1;
+        return 0;
+    });
+
+    const line = data[0];
+    constructLargeTable(sortedKeys,line);
+    //constructMobileTable(sortedKeys,data);
+}
+
+// fillTableAggregegated constructs the aggregated table
+function fillTableAggregegated(keys,agg) {
+    const sortedKeys = keys.slice();
+    sortedKeys.sort(function(a,b) {
+        var va = agg[a];
+        var vb = agg[b];
+         if (va < vb)
+            return 1;
+        if (va > vb)
+            return -1;
+        return 0;
+    });
+
+    const line = sortedKeys.reduce((acc,key) => {
+        acc[key] =agg[key];
+        return acc;
+    },{});
+
+    constructLargeTable(sortedKeys,line);
+    //constructMobileTable(sortedKeys,data);
 }
 
 const mobileHeaderCandidate = "Candidate";
 const mobileHeaderVote = "Count";
 
 // constructMobileTable creates the table a  mobile screen
-function constructMobileTable(sortedKeys,data) {
-    $(tableMobileId).find("thead tr").remove();
-    // headers are two columns: polling station | vote
-    const tr = $('<tr></tr>');
-    $("<th></th>").html('<div class="candidate-name">' + mobileHeaderCandidate
-        + '</div>').appendTo(tr);
-    $("<th></th>").html('<div class="candidate-vote">' + mobileHeaderVote
-        + '</div>').appendTo(tr);
-    $(tableMobileId).find("thead").append(tr);
+/*function constructMobileTable(sortedKeys,data) {*/
+    //$(tableMobileId).find("thead tr").remove();
+    //// headers are two columns: polling station | vote
+    //const tr = $('<tr></tr>');
+    //$("<th></th>").html('<div class="candidate-name">' + mobileHeaderCandidate
+        //+ '</div>').appendTo(tr);
+    //$("<th></th>").html('<div class="candidate-vote">' + mobileHeaderVote
+        //+ '</div>').appendTo(tr);
+    //$(tableMobileId).find("thead").append(tr);
 
 
-    $(tableMobileId).find("tbody tr").remove();
-    // data.length === 1 anymore
-    const entry = data[0];
-    const tbody = $(tableMobileId).find("tbody");
-    sortedKeys.forEach(key => {
-        const tr = $("<tr></tr>");
-        var vote = entry[key];
-        // add candidate
-        $('<td class="candidate-td"></td>').html(candidateDiv(key)).appendTo(tr);
-        // add vote
-        voteTd(vote).appendTo(tr);
-        tbody.append(tr);
-    });
-}
+    //$(tableMobileId).find("tbody tr").remove();
+    //// data.length === 1 anymore
+    //const entry = data[0];
+    //const tbody = $(tableMobileId).find("tbody");
+    //sortedKeys.forEach(key => {
+        //const tr = $("<tr></tr>");
+        //var vote = entry[key];
+        //// add candidate
+        //$('<td class="candidate-td"></td>').html(candidateDiv(key)).appendTo(tr);
+        //// add vote
+        //voteTd(vote).appendTo(tr);
+        //tbody.append(tr);
+    //});
+//}
 
 // constructLargeTable creates the table for a large screen
-function constructLargeTable(sortedKeys,data) {
+function constructLargeTable(sortedKeys,line) {
     constructLargeHeaders(sortedKeys);
-    // set up the table columns according to the first entry
-    for(var i = 0; i < data.length; i++) {
-        constructLargeRows(sortedKeys,data[i]);
-    }
-}
 
-// appendRow fills up the table with the given object (row) by using only the
-// keys specified.
-function constructLargeRows(keys,row) {
-    $(tableLargeId).find("tbody tr").remove();
+    $(tableLargeId).find("tbody").find("tr").remove();
     const tr = $("<tr></tr>");
-    for(var i = 0; i < keys.length; i++) {
-        const key = keys[i];
-        var text = row[key];
+    sortedKeys.forEach(key => {
+        const text = line[key];
         voteTd(text).appendTo(tr);
-    }
+    });
     $(tableLargeId).find("tbody").append(tr);
 }
 
