@@ -183,9 +183,16 @@ h4 {
     display: inline-block;
     position: relative;
     z-index: 5;
-    font-family: 'LatoWebLight';
-    font-size: 16px;
-    font-style: italic;
+    font-family: 'LatoWeb';
+    font-size: 14px;
+    line-height: 22px;
+}
+
+@media (min-width:768px) {
+    h4 {
+        font-size: 16px;
+        line-height: 24px;
+    }
 }
 
 h5 {
@@ -228,7 +235,7 @@ h6 {
 h7 {
     position: relative;
     font-family: 'LatoWebSemibold';
-    font-size: 20px;
+    font-size: 21px;
     line-height: 24px;
     color: var(--color-lightblue);
     z-index: 5;
@@ -254,7 +261,7 @@ section {
 
 /*MAIN SECTION*/
 #main .container-fluid {
-    background: linear-gradient(#FDFBFB,red);
+    background: linear-gradient(#FDFBFB,#F5F7FA);
 }
 
 #main #logo {
@@ -342,5 +349,24 @@ section {
     top: 0px;
 }
 .main-l2 .fill {
+    background-color: var(--color-pastelblue);
+}
+
+
+.main-l3 {
+    left: 5%;
+    width: 30%;
+    top: 28px;
+}
+.main-l3 .fill {
+    background-color: var(--color-pastelblue);
+}
+
+.main-l4 {
+    right: 5%;
+    width: 30%;
+    top: 28px;
+}
+.main-l4 .fill {
     background-color: var(--color-pastelblue);
 }

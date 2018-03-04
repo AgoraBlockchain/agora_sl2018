@@ -170,10 +170,14 @@ h3 {
     position: relative;
     z-index: 5;
     font-family: 'LatoWebLight';
-    font-size: 14px;
+    font-size: 2vw;
     line-height: 22px;
 }
-
+@media (min-width: 320px) {
+    h3 {
+        font-size: 14px;
+    }
+}
 @media (min-width:768px) {
     h3 {
         font-size: 16px;
@@ -273,12 +277,11 @@ h7 {
     top: calc(50% - 25px);
     left: calc(50% - 25px);
 	background-color: rgba(0,0,0,0);
-	border:5px solid rgba(0,183,229,0.9);
+	border:5px solid var(--color-black);
 	opacity:.9;
 	border-right:5px solid rgba(0,0,0,0);
 	border-left:5px solid rgba(0,0,0,0);
-	border-radius:50px;
-	box-shadow: 0 0 35px #2187e7;
+	border-radius:25px;
 	width:50px;
 	height:50px;
 	-moz-animation:spinPulse 2s infinite ease-in-out;
@@ -289,12 +292,11 @@ h7 {
     top: calc(50% - 15px);
     left: calc(50% - 15px);
 	background-color: rgba(0,0,0,0);
-	border:5px solid rgba(0,183,229,0.9);
+	border:5px solid rgba(0,0,0,0.9);
 	opacity:.9;
 	border-left:5px solid rgba(0,0,0,0);
 	border-right:5px solid rgba(0,0,0,0);
 	border-radius:50px;
-	box-shadow: 0 0 15px #2187e7; 
 	width:30px;
 	height:30px;
 	-moz-animation:spinoffPulse 1s infinite linear;
@@ -321,7 +323,7 @@ h7 {
 
 #piechart {
   width: 100%; 
-  min-height: 400px;
+  min-height: 500px;
 }
 
 /*SECTIONS*/
@@ -332,93 +334,56 @@ section {
 
 /*MAIN SECTION*/
 .container-fluid {
-    background: linear-gradient(#FDFBFB,red);
+    background: linear-gradient(#FDFBFB,#F5F7FA);
 }
 
-#main #logo {
-    z-index: 30;
-    display: block;
-    margin: auto;
-    max-width: 140px;
+#select-polling {
+    border: 1;
+    outline: none;
+    border-radius: 0;
+    text-align: center;
+    font-family: 'LatoWebLight';
+    font-size: 22px;
 }
 
-#main .sierra-leone-flag {
-    width: 99px;
-    height: 66px;
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
 }
 
-#main .access-c {
-    position: absolute;
-    left: calc(50% - 125px);
-    width: 250px;
-    height: 56px;
+.selection {
+}
+#results-table {
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+}
+.candidate {
+    width: 161px;
+    height: 70px;
+    border: 1px solid var(--color-gray);
     background: white;
-    -webkit-filter: drop-shadow(1px 3px 4px rgba(0, 0, 0, 0.16));
+    text-align: center;
 }
-
-#main .access-t {
-    position: absolute;
-    left: calc(50% - 30px);
-    top: calc(50% - 15px);
+.candidate-color {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
 }
-
-/*LINES*/
-
-.line {
-    position: absolute;
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
+.candidate-name {
+    font-family: 'LatoWebLight';
+    font-size: 90%;
 }
-
-/*VERTICAL*/
-
-.vl {
-    width: 2px;
+.vote-c {
+    border: 1px solid var(--color-gray);
+    background: white;
+    text-align: center;
 }
-@media (min-width:768px) {
-    .vl {
-        width: 4px;
-    }
-}
-
-/*HORIZONTAL*/
-
-.hl {
-    height: 2px;
-}
-@media (min-width:768px) {
-    .hl {
-        height: 4px;
-    }
-}
-
-/*FILLING*/
-
-.fill {
-    content: "";
-    display: inline;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-}
-
-.main-l1 {
-    left: 5%;
-    height: calc(100% - 28px);
-    top: 0px;
-}
-.main-l1 .fill {
-    background-color: var(--color-pastelblue);
-}
-
-.main-l2 {
-    right: 5%;
-    height: calc(100% - 28px);
-    top: 0px;
-}
-.main-l2 .fill {
-    background-color: var(--color-pastelblue);
+.vote {
+    font-family: 'LatoWebLight';
+    font-size: 100%;
 }

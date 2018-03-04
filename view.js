@@ -99,10 +99,25 @@ function fillAggregated(aggregated) {
         // set chart options
         var options = {'title':"",
                        backgroundColor: { fill:'transparent' },
-            colors: selectedColors,
-                       sliceVisibilityThreshold: 0.0000002,
+                       colors: selectedColors,
+                       legend: {
+                           position: 'right',
+                           alignment: "center",
+                           maxLines: 3,
+                           textStyle:{
+                               color: "#3E3E3E",
+                               fontName: "LatoWebLight",
+                               fontSize: 20,
+                           }
+                       },
+                       sliceVisibilityThreshold: 0.02,
                        pieResidueSliceLabel: "Other",
-            chartArea: {left: 0, top: 100, width: "100%", height: "50%"}
+                       chartArea: {
+                           left: 0,
+                           top: 25,
+                           width: "100%",
+                           height: "90%"
+                       }
                       };
 
         // instantiate and draw our chart, passing in some options.
@@ -116,6 +131,9 @@ function fillAggregated(aggregated) {
     // Set a callback to run when the Google Visualization API is loaded.
     google.charts.setOnLoadCallback(drawChart);
 }
+
+const tableLargeId = "#results-table";
+const tableMobileId = "#results-table-mobile";
 
 // fillTable takes the data returned by fetchData and display each object in the
 // array as one line in the table.
@@ -147,48 +165,97 @@ function fillTable(data,keys,agg) {
             return 0;
         });
     }
-    fillHeaders(sortedKeys);
-    $("#results-table tbody tr").remove();
-        // set up the table columns according to the first entry
+    constructLargeTable(sortedKeys,data);
+    constructMobileTable(sortedKeys,data);
+}
+
+const mobileHeaderCandidate = "Candidate";
+const mobileHeaderVote = "Count";
+
+// constructMobileTable creates the table a  mobile screen
+function constructMobileTable(sortedKeys,data) {
+    $(tableMobileId).find("thead tr").remove();
+    // headers are two columns: polling station | vote
+    const tr = $('<tr></tr>');
+    $("<th></th>").html('<div class="candidate-name">' + mobileHeaderCandidate
+        + '</div>').appendTo(tr);
+    $("<th></th>").html('<div class="candidate-vote">' + mobileHeaderVote
+        + '</div>').appendTo(tr);
+    $(tableMobileId).find("thead").append(tr);
+
+
+    $(tableMobileId).find("tbody tr").remove();
+    // data.length === 1 anymore
+    const entry = data[0];
+    const tbody = $(tableMobileId).find("tbody");
+    sortedKeys.forEach(key => {
+        const tr = $("<tr></tr>");
+        var vote = entry[key];
+        // add candidate
+        $('<td class="candidate-td"></td>').html(candidateDiv(key)).appendTo(tr);
+        // add vote
+        voteTd(vote).appendTo(tr);
+        tbody.append(tr);
+    });
+}
+
+// constructLargeTable creates the table for a large screen
+function constructLargeTable(sortedKeys,data) {
+    constructLargeHeaders(sortedKeys);
+    // set up the table columns according to the first entry
     for(var i = 0; i < data.length; i++) {
-        appendRow(sortedKeys,data[i]);
+        constructLargeRows(sortedKeys,data[i]);
     }
 }
 
 // appendRow fills up the table with the given object (row) by using only the
 // keys specified.
-function appendRow(keys,row) {
+function constructLargeRows(keys,row) {
+    $(tableLargeId).find("tbody tr").remove();
     const tr = $("<tr></tr>");
-    const getDiv = function(text) {
-        return '<div class="vote">'+text+'</div>';
-    }
     for(var i = 0; i < keys.length; i++) {
         const key = keys[i];
         var text = row[key];
-        if (text === undefined) text = "";
-        $("<td></td>").html(getDiv(text)).appendTo(tr);
+        voteTd(text).appendTo(tr);
     }
-    $("#results-table tbody").append(tr);
+    $(tableLargeId).find("tbody").append(tr);
 }
 
+
 // fillHeaders fills up the header table columns
-function fillHeaders(fields) {
-    $("#results-table thead tr").remove();
-    const tr = $('<tr></tr>').attr({ class: ["class2", "class3"].join(' ') });
+function constructLargeHeaders(fields) {
+    $(tableLargeId).find("thead tr").remove();
+
+    const tr = $('<tr></tr>');
     const selectedColors = fieldsToColors(fields);
     // returns the HTML that is put for one field and color
     const htmlTh = function(i) {
         const field = fields[i];
         const color = selectedColors[i];
         return '<div class="candidate-color" style="background:' + color +
-            ';"></div><div class="candidate-name">'+field+'</div>';
+            ';"></div>' + candidateDiv(field);
     };
 
     for(var i = 0; i < fields.length; i++) {
-        //const th = $('<th></th>').text([i]).attr({class:"candidate",scope:"col"}).appendTo(tr);
         const th = $('<th></th>').html(htmlTh(i)).attr({class:"candidate",scope:"col"}).appendTo(tr);
     }
-    $("#results-table thead").append(tr);
+    $(tableLargeId).find("thead").append(tr);
+}
+
+// voteTd returns the td used for displaying a vote
+function voteTd(text) {
+    if (text === undefined) text = "";
+    return $("<td class='vote-c'></td>").html(voteDiv(text));
+}
+
+// voteDiv returns the div to write a vote result
+function voteDiv(text) {
+    return '<div class="vote">'+text+'</div>';
+}
+
+// candidateDiv returns the div to write to a candidate name
+function candidateDiv(text) {
+    return '<div class="candidate-name">'+text+'</div>';
 }
 
 

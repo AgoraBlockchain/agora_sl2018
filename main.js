@@ -11,7 +11,7 @@ const ethContractAddr = "contract.address";
 const ethContractAbi = "contract.abi";
 
 // key representing "all" data from the drop down list
-const selectKeyAll = "All";
+const selectKeyAll = "All polling stations";
 const titleChart = "Election Results";
 
 const keyTest = "test";
@@ -58,7 +58,7 @@ $(function() {
                 'opacity': '0'
             });
             $('body,html').css('overflow','visible');
-        }, 50);
+        }, 500);
 
         return Promise.resolve(info);
     }).then((skipInfo) => {
