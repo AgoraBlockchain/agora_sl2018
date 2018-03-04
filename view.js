@@ -60,9 +60,10 @@ function fillAggregated(aggregated) {
 
         // set chart options
         var options = {'title':"",
-                       sliceVisibilityThreshold: 0.000005,
+                       backgroundColor: { fill:'transparent' },
+                       sliceVisibilityThreshold: 0.0000002,
                        pieResidueSliceLabel: "Other",
-            chartArea: {left: 0, top: 0, width: "100%", height: "100%"}
+            chartArea: {left: 0, top: 100, width: "100%", height: "50%"}
                       };
 
         // instantiate and draw our chart, passing in some options.
