@@ -338,13 +338,10 @@ section {
 }
 
 #select-polling {
-    background: transparent;
     border: 1;
     outline: none;
     border-radius: 0;
     text-align: center;
-    margin-right: -20px;
-    padding-right: 20px;
     font-family: 'LatoWebLight';
     font-size: 22px;
 }

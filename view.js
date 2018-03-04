@@ -111,7 +111,7 @@ function fillAggregated(aggregated) {
                                fontSize: 20,
                            }
                        },
-                       sliceVisibilityThreshold: 0.0000002,
+                       sliceVisibilityThreshold: 0.02,
                        pieResidueSliceLabel: "Other",
                        chartArea: {
                            left: 0,
