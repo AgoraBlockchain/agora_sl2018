@@ -87,10 +87,25 @@ function fillAggregated(aggregated) {
         // set chart options
         var options = {'title':"",
                        backgroundColor: { fill:'transparent' },
-            colors: selectedColors,
+                       colors: selectedColors,
+                       legend: {
+                           position: 'right',
+                           alignment: "center",
+                           maxLines: 3, 
+                           textStyle:{
+                               color: "#3E3E3E",
+                               fontName: "LatoWebLight",
+                               fontSize: 20,
+                           }
+                       },
                        sliceVisibilityThreshold: 0.0000002,
                        pieResidueSliceLabel: "Other",
-            chartArea: {left: 0, top: 100, width: "100%", height: "50%"}
+                       chartArea: {
+                           left: 0,
+                           top: 25,
+                           width: "100%",
+                           height: "90%"
+                       }
                       };
 
         // instantiate and draw our chart, passing in some options.
