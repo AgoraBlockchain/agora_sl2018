@@ -1,5 +1,5 @@
 // colors to use to decorate the chart and the table
-const staticColors = ['#e0440e', '#e6693e', '#ec8f6e', '#f3b49f', '#f6c7b6'];
+const staticColors = ['#35A1EA', '#4BC0BF', '#FFCD55', '#FE9E40', '#FF6383', '#9898FE', '#1288A6', '#1E3798', '#966393', '#56203D', '#815355', '#C3B299', '#CBD4C2', '#755C1B', '#7A4419', '#515A47'];
 
 // fillPage takes care of filling the page with the data, the fields and the
 // aggregated data
@@ -84,12 +84,13 @@ function fillAggregated(aggregated) {
             return 0;
         });
     console.log("SORTED DATA",rows);
-    const selectedColors = fieldsToColors(rows);
         var n = 18;
         for(var i =0; i < n;i++) {
             rows.push(["candidat"+i,i*8]);
         }
 
+    const selectedColors = fieldsToColors(rows);
+    
     const drawChart = function() {
         // create the data table.
         var data = new google.visualization.DataTable();
@@ -111,7 +112,7 @@ function fillAggregated(aggregated) {
                                fontSize: 20,
                            }
                        },
-                       sliceVisibilityThreshold: 0.02,
+                       sliceVisibilityThreshold: 0.000002,
                        pieResidueSliceLabel: "Other",
                        chartArea: {
                            left: 0,
