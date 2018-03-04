@@ -155,7 +155,7 @@ function fillTableDetail(keys,data) {
 
     const line = data[0];
     constructLargeTable(sortedKeys,line);
-    //constructMobileTable(sortedKeys,data);
+    constructMobileTable(sortedKeys,line);
 }
 
 // fillTableAggregegated constructs the aggregated table
@@ -177,38 +177,36 @@ function fillTableAggregegated(keys,agg) {
     },{});
 
     constructLargeTable(sortedKeys,line);
-    //constructMobileTable(sortedKeys,data);
+    constructMobileTable(sortedKeys,line);
 }
 
 const mobileHeaderCandidate = "Candidate";
 const mobileHeaderVote = "Count";
 
 // constructMobileTable creates the table a  mobile screen
-/*function constructMobileTable(sortedKeys,data) {*/
-    //$(tableMobileId).find("thead tr").remove();
-    //// headers are two columns: polling station | vote
-    //const tr = $('<tr></tr>');
-    //$("<th></th>").html('<div class="candidate-name">' + mobileHeaderCandidate
-        //+ '</div>').appendTo(tr);
-    //$("<th></th>").html('<div class="candidate-vote">' + mobileHeaderVote
-        //+ '</div>').appendTo(tr);
-    //$(tableMobileId).find("thead").append(tr);
+function constructMobileTable(sortedKeys,line) {
+    $(tableMobileId).find("thead tr").remove();
+    // headers are two columns: polling station | vote
+    const tr = $('<tr></tr>');
+    $("<th></th>").html('<div class="candidate-name">' + mobileHeaderCandidate
+        + '</div>').appendTo(tr);
+    $("<th></th>").html('<div class="candidate-vote">' + mobileHeaderVote
+        + '</div>').appendTo(tr);
+    $(tableMobileId).find("thead").append(tr);
 
 
-    //$(tableMobileId).find("tbody tr").remove();
-    //// data.length === 1 anymore
-    //const entry = data[0];
-    //const tbody = $(tableMobileId).find("tbody");
-    //sortedKeys.forEach(key => {
-        //const tr = $("<tr></tr>");
-        //var vote = entry[key];
-        //// add candidate
-        //$('<td class="candidate-td"></td>').html(candidateDiv(key)).appendTo(tr);
-        //// add vote
-        //voteTd(vote).appendTo(tr);
-        //tbody.append(tr);
-    //});
-//}
+    $(tableMobileId).find("tbody tr").remove();
+    const tbody = $(tableMobileId).find("tbody");
+    sortedKeys.forEach(key => {
+        const tr = $("<tr></tr>");
+        var vote = line[key];
+        // add candidate
+        $('<td class="candidate-td"></td>').html(candidateDiv(key)).appendTo(tr);
+        // add vote
+        voteTd(vote).appendTo(tr);
+        tbody.append(tr);
+    });
+}
 
 // constructLargeTable creates the table for a large screen
 function constructLargeTable(sortedKeys,line) {
