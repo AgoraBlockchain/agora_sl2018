@@ -342,8 +342,10 @@ section {
 #select-polling {
     border: 1;
     outline: none;
+    height: 45px;
     border-radius: 0;
     text-align: center;
+    text-align-last:center;
     font-family: 'LatoWebLight';
     font-size: 22px;
 }
