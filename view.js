@@ -151,7 +151,7 @@ function fillTableDetail(keys,data) {
         return 0;
     });
 
-    const line = data[0];
+    const line = withPercentage(data[0]);
     constructLargeTable(sortedKeys,line);
     constructMobileTable(sortedKeys,line);
 }
@@ -169,10 +169,10 @@ function fillTableAggregegated(keys,agg) {
         return 0;
     });
 
-    const line = sortedKeys.reduce((acc,key) => {
-        acc[key] =agg[key];
+    const line = withPercentage(sortedKeys.reduce((acc,key) => {
+        acc[key] = agg[key];
         return acc;
-    },{});
+    },{}));
 
     constructLargeTable(sortedKeys,line);
     constructMobileTable(sortedKeys,line);
@@ -206,23 +206,53 @@ function constructMobileTable(sortedKeys,line) {
     });
 }
 
+// Number of cells for which the table wraps over
+const wrapOverCell = 8;
+
 // constructLargeTable creates the table for a large screen
 function constructLargeTable(sortedKeys,line) {
-    constructLargeHeaders(sortedKeys);
+    //constructLargeHeaders(sortedKeys);
 
-    $(tableLargeId).find("tbody").find("tr").remove();
-    const tr = $("<tr></tr>");
-    sortedKeys.forEach(key => {
-        const text = line[key];
-        voteTd(text).appendTo(tr);
+    const tableBody = $(tableLargeId).find("tbody");
+    tableBody.find("tr").remove();
+
+    const selectedColors = fieldsToColors(sortedKeys);
+    // returns the HTML that is put for one field and color
+    const candidateTd = function(i) {
+        const field = sortedKeys[i];
+        const color = selectedColors[i];
+        return '<div class="candidate-color" style="background:' + color +
+            ';"></div>' + candidateDiv(field);
+    };
+
+    var candidateRow = $("<tr></tr>");
+    var voteRow = $("<tr></tr>");
+    sortedKeys.forEach((key,idx) => {
+        // append candidate
+        const candidateCell = $('<td></td>')
+            .html(candidateTd(idx))
+            .attr({class:"candidate",scope:"col"})
+            .appendTo(candidateRow);
+        // append vote
+        const vote = line[key];
+        voteTd(vote).appendTo(voteRow);
+        // wrap over?
+        const mustWrap = ((idx+1) % wrapOverCell) === 0;
+        const isAtEnd = idx === (sortedKeys.length - 1);
+        if (mustWrap || isAtEnd) {
+            // append the two rows and create a new second tuple
+            tableBody.append(candidateRow);
+            tableBody.append(voteRow);
+            candidateRow = $("<tr></tr>");
+            voteRow = $("<tr></tr>");
+        }
     });
-    $(tableLargeId).find("tbody").append(tr);
 }
 
 
 // fillHeaders fills up the header table columns
 function constructLargeHeaders(fields) {
-    $(tableLargeId).find("thead tr").remove();
+    $(tableLargeId).find("tbody tr").remove();
 
     const tr = $('<tr></tr>');
     const selectedColors = fieldsToColors(fields);
@@ -237,26 +267,36 @@ function constructLargeHeaders(fields) {
     for(var i = 0; i < fields.length; i++) {
         const th = $('<th></th>').html(htmlTh(i)).attr({class:"candidate",scope:"col"}).appendTo(tr);
     }
-    $(tableLargeId).find("thead").append(tr);
+    $(tableLargeId).find("tbody").append(tr);
 }
 
 // voteTd returns the td used for displaying a vote
 function voteTd(text) {
     if (text === undefined) text = "";
-    return $("<td class='vote-c'></td>").html(voteDiv(text));
+    const num = text[0];
+    const perc = text[1];
+    const html = '<div class="vote">'+num+'<br>'+perc+'%</div>';
+    return $("<td class='vote-c'></td>").html(html);
 }
 
-// voteDiv returns the div to write a vote result
-function voteDiv(text) {
-    return '<div class="vote">'+text+'</div>';
-}
 
 // candidateDiv returns the div to write to a candidate name
 function candidateDiv(text) {
     return '<div class="candidate-name">'+text+'</div>';
 }
 
-
+// withPercentage returns an array of [vote,%]
+// votes is a dictionary Cendidate => Count
+// output is a dictionary Candidate => [Count, percentage]
+function withPercentage(line) {
+    const keys = Object.keys(line);
+    const total = keys.reduce((acc,key) => acc+line[key],0);
+    return keys.reduce((acc,key) => {
+        const v = line[key];
+        acc[key] = [v,(v / total * 100).toFixed(2)];
+        return acc;
+    },{});
+}
 // displayInfo writes some info about the roster and the skipchain id the page
 // is using
 //function displayInfo(roster,genesisID) {
