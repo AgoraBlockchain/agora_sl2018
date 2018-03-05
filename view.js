@@ -1,5 +1,5 @@
 // colors to use to decorate the chart and the table
-const staticColors = ['#35A1EA', '#4BC0BF', '#FFCD55', '#FE9E40', '#FF6383', '#9898FE', '#1288A6', '#1E3798', '#966393', '#56203D', '#815355', '#C3B299', '#CBD4C2', '#755C1B', '#7A4419', '#515A47'];
+const staticColors = ['#35A1EA', '#4BC0BF', '#107189', '#00C200', '#A5FFC1', '#65FFFF', '#1E3798', '#808100', '#9898FE', '#8700A1', '#F11EEC', '#FF6383', '#FFC8DE', '#E4BCFF', '#BDFF00', '#FFF031', '#FFD8AE', '#FF0000', '#9B0000', '#A26B22', '#FFCD55', '#FF9A00', '#000000', '#B7B7B7', '#FFFFFF'];
 
 // fillPage takes care of filling the page with the data, the fields and the
 // aggregated data
