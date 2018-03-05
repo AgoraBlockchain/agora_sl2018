@@ -256,7 +256,8 @@ function getBasePathFor(file) {
     if (isTestPage()) {
         return file;
     }
-    return file;
+    //return  productionBasePath + file;
+    return  file;
 }
 
 function isTestPage() {
@@ -290,11 +291,10 @@ function dataKey() {
 // fetchInfo will fetch the roster and the genesis block id and return a Promise
 // which holds [roster,genesisID] as a value.
 function fetchInfo() {
-    const rosterLink  = getBasePathFor(rosterURL);
-    const genesisLink = getBasePathFor(genesisURL);
+
     const rosterPromise = new Promise(function(resolve,reject) {
         $.ajax({
-            url:
+            url: getBasePathFor(rosterURL),
             dataType: "text",
             contentType: "text/plain",
         }).done(function(roster) {
@@ -308,7 +308,7 @@ function fetchInfo() {
 
     const genesisPromise = new Promise(function(resolve,reject) {
         $.ajax({
-            url:
+            url: getBasePathFor(genesisURL),
             dataType: "text",
             contentType: "text/plain",
         }).done(function(roster) {
