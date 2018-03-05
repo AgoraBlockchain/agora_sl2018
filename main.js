@@ -18,10 +18,6 @@ const ethDataJson = dataFolder + "data.json";
 const ethContractAddr = dataFolder + "contract.address";
 const ethContractAbi = dataFolder + "contract.abi";
 
-// key representing "all" data from the drop down list
-const selectKeyAll = "All polling stations";
-const titleChart = "Election Results";
-
 
 // ////////////////
 // Modules
@@ -35,7 +31,7 @@ const misc = cothority.misc;
 var skipData = {};
 var skipFields = [];
 var aggregated = {};
-
+var areas = {};
 // init page
 $(function() {
     initLogic();
@@ -48,16 +44,11 @@ $(function() {
 
     // show the loading message
     // first collect the skipchain info
-    collectSkipchain().then((info) => {
+    collectSkipchain().then((skipchainData) => {
         // then display
-        var [data,fields,agg] = info;
-        fillPage(data,fields,agg);
-        /*setTimeout(function() {
-            dialog.modal("hide");
-        },1000);*/
-
-    //loading overlay
-    setTimeout(
+        //var [data,fields,agg] = info;
+        fillPage(skipchainData);
+        setTimeout(
         function () {
             $('#loading-overlay').css({
                 'visibility': 'hidden',
@@ -66,16 +57,15 @@ $(function() {
             $('body,html').css('overflow','visible');
         }, 500);
 
-        return Promise.resolve(info);
-    }).then((skipInfo) => {
-        const p1 = Promise.resolve(skipInfo);
+        return Promise.resolve(skipchainData);
+    }).then((skipchainData) => {
+        const p1 = Promise.resolve(skipchainData);
         const p2 = collectEthereum();
         return Promise.all([p1,p2]);
     }).then(info => {
-        var [skip, ethData] = info;
-        var [skipData, skipFields, agg] = skip;
+        var [skipchainData, ethData] = info;
         console.log("ethereum data resolved");
-        if (isEqual(skipData,skipFields,ethData)) {
+        if (isEqual(skipchainData.data,skipchainData.fields,ethData)) {
             console.log("DATA ARE EQUAL");
         } else {
             console.log("DATA ARE NOT EQUAL");
@@ -177,10 +167,27 @@ function collectSkipchain() {
     }).then(csvParsed => {
         skipData = csvParsed.data;
         skipFields = csvParsed.meta.fields;
-        aggregated = aggregateData(skipData,skipFields.slice(1))
+        // skip pollinG Station, and area
+        aggregated = aggregateData(skipData,skipFields.slice(2))
+        areas = skipData.reduce((acc,row) => {
+            const keyArea = skipFields[1];
+            acc[row[keyArea]] = [];
+            return acc;
+        },{});
+        skipData.forEach(row => {
+            const keyPoll = skipFields[0];
+            const keyArea = skipFields[1];
+            areas[row[keyArea]].push(row[keyPoll]);
+        });
+        const skipchainData = {
+            data: skipData,
+            fields: skipFields,
+            aggregated: aggregated,
+            areas: areas,
+        }
         //console.log(skipData);
         //console.log(aggregated);
-        return Promise.resolve([skipData,skipFields,aggregated]);
+        return Promise.resolve(skipchainData);
     });
 }
 
@@ -242,6 +249,8 @@ function processCiscStorage(storage) {
         const keys = Object.keys(dict);
         // remove the first column since its NOT number but polling station
         // names
+        keys.shift();
+        // remove the second column since it's NOT number but area indication
         keys.shift();
         keys.forEach(key => {
             if (typeof dict[key] !== "number") {
