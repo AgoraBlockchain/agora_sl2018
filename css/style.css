@@ -152,7 +152,7 @@ h1 {
 @media (min-width:1200px) {
     h1 {
         font-size: 40px;
-        line-height: 49px;
+        line-height: 62px;
     }
 }
 
@@ -196,17 +196,17 @@ h3 {
     }
 }
 
-h4 {
+h3 {
     display: inline-block;
     position: relative;
     z-index: 5;
-    font-family: 'LatoWeb';
+    font-family: 'LatoWebLight';
     font-size: 14px;
     line-height: 22px;
 }
 
 @media (min-width:768px) {
-    h4 {
+    h3 {
         font-size: 16px;
         line-height: 24px;
     }
@@ -298,8 +298,8 @@ section {
 }
 
 #main .sierra-leone-flag {
-    width: 99px;
-    height: 66px;
+    width: 111px;
+    height: 74px;
 }
 
 #main .access-c {
@@ -414,7 +414,7 @@ section {
 
 .main-l6 {
     left: 0;
-    width: 33.333%;
+    width: 90%;
     top: calc(50% - 2px);
 }
 
@@ -432,17 +432,9 @@ section {
 }
 
 .main-l9 {
-    left: 50%;
-    width: calc(30% - 2px);
+    left: 10%;
+    width: 90%;
     top: calc(50% - 2px);
-}
-
-@media (min-width:992px) {
-    .main-l9 {
-        left: 50%;
-        width: calc(50% - 2px);
-        top: calc(50% - 2px);
-    }
 }
 
 .main-l10 {
