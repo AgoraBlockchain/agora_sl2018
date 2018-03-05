@@ -1,8 +1,6 @@
 // colors to use to decorate the chart and the table
 const staticColors = ['#35A1EA', '#4BC0BF', '#107189', '#00C200', '#1E3798', '#808100', '#9898FE', '#8700A1', '#F11EEC', '#FF6383', '#A5FFC1', '#65FFFF', '#FFC8DE', '#E4BCFF', '#BDFF00', '#FFF031', '#FFD8AE', '#FF0000', '#9B0000', '#A26B22', '#FFCD55', '#FF9A00', '#000000', '#B7B7B7', '#FFFFFF'];
 
-const staticCandidates = ['Kandeh Conteh', 'Kandeh Yumkella', 'Samura Kamara', 'Beresford Williams', 'Charles Margai', 'Gbandi Ngobeh', 'Henry Kabuta', 'Jonathan Sandy', 'Julius Bio', 'Mohamed Sowa', 'Mohamed Mansaray', 'Mohamed C Bah', 'Musa Tarawally', "Patrick O'Dwyer", 'Samuel Sam-Sumana', 'Olufemi Claudius-Cole', 'Blank Note', 'Invalid Note'];
-
 // fillPage takes care of filling the page with the data, the fields and the
 // aggregated data
 function fillPage(data,fields,agg) {
@@ -181,21 +179,8 @@ function fillTableAggregegated(keys,agg) {
     constructMobileTable(sortedKeys,line);
 }
 
-const mobileHeaderCandidate = "Candidate";
-const mobileHeaderVote = "Count";
-
 // constructMobileTable creates the table a  mobile screen
 function constructMobileTable(sortedKeys,line) {
-    $(tableMobileId).find("thead tr").remove();
-    // headers are two columns: polling station | vote
-    const tr = $('<tr></tr>');
-    $("<th></th>").html('<div class="candidate-name">' + mobileHeaderCandidate
-        + '</div>').appendTo(tr);
-    $("<th></th>").html('<div class="candidate-vote">' + mobileHeaderVote
-        + '</div>').appendTo(tr);
-    $(tableMobileId).find("thead").append(tr);
-
-
     const tbody = $(tableMobileId).find("tbody");
     const selectedColors = fieldsToColors(sortedKeys);
 
@@ -303,12 +288,6 @@ function withPercentage(line) {
         return acc;
     },{});
 }
-// displayInfo writes some info about the roster and the skipchain id the page
-// is using
-//function displayInfo(roster,genesisID) {
-//    $("#title-skipid").text("skipchain ID: " + genesisID);
-//}
-
 
 function initView() {
     showWaitingDialog();

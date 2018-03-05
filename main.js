@@ -1,7 +1,14 @@
 // //////////////////
 // Constants
 // //////////////////
-const dataFolder = "data/";
+// basePath of the sierra leone page
+const basePath = "sl2018/"
+// page showing the results for the first round
+const firstRound = basePath + "results.html";
+// page showing the results for the second round
+const secondRound = basePath + "results2.html";
+// where to find the config information to fetch the data
+const dataFolder = basePath + "data/";
 // the url to get the roster
 const rosterURL = dataFolder + "public.toml";
 // the url to get the genesis file
@@ -15,8 +22,6 @@ const ethContractAbi = dataFolder + "contract.abi";
 const selectKeyAll = "All polling stations";
 const titleChart = "Election Results";
 
-const keyTest = "test";
-const keyProduction = "sl2018";
 
 // ////////////////
 // Modules
@@ -247,13 +252,29 @@ function processCiscStorage(storage) {
     return parsed;
 }
 
+function isTestPage() {
+    if (window.location.href.match(/test.agora.vote/))
+        return true;
+
+    return false;
+}
+
+const keyTest = "test";
+const keyRound1 = "sl2018-1";
+const keyRound2 = "sl2018-2";
+
 // dataKey returns a different key if we are on the test page than if we are on
 // the final page
 function dataKey() {
-    if (window.location.href.match(/sl2018.agora.vote/)) {
-        return keyProduction;
+    if (isTestPage) {
+        return keyTest;
     }
-    return keyTest;
+    const url = window.location.href;
+    if (url.match(firstRound))
+        return keyRound1;
+
+    if (url.match(secondRound))
+        return keyRound2;
 }
 
 // fetchInfo will fetch the roster and the genesis block id and return a Promise

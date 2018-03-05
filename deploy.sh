@@ -10,7 +10,7 @@ if [ ! -f "$1" ];
 fi
 
 csv=$1
-key="sl2018"
+key="sl2018-1"
 
 # push to skipchain first
 cisc kv file "$csv" --key "$key"
@@ -19,3 +19,4 @@ cisc kv file "$csv" --key "$key"
 cd geens/cli
 node index "$csv"
 cp data.json ../../data.json
+#ssh agora571@77.104.141.14 -p18765
