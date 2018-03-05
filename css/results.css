@@ -359,7 +359,12 @@ button:focus {
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16);
 }
 .candidate {
-    width: 161px;
+    height: 70px;
+    border: 1px solid var(--color-gray);
+    background: white;
+    text-align: center;
+}
+.candidate-td {
     height: 70px;
     border: 1px solid var(--color-gray);
     background: white;
@@ -376,7 +381,7 @@ button:focus {
 }
 .candidate-name {
     font-family: 'LatoWebLight';
-    font-size: 40%;
+    font-size: 80%;
 }
 .vote-c {
     border: 1px solid var(--color-gray);
