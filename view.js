@@ -105,6 +105,7 @@ function fillAggregated(aggregated) {
         var options = {'title':"",
                        backgroundColor: { fill:'transparent' },
                        colors: selectedColors,
+                       fontName: "LatoWebLight",
                        legend: {
                            position: 'right',
                            alignment: "center",

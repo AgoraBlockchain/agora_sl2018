@@ -305,7 +305,7 @@ h7 {
 	-webkit-animation:spinoffPulse 1s infinite linear;
 }
 @-moz-keyframes spinPulse {
-	0% { -moz-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7;}
+	0% { -moz-transform:rotate(160deg); opacity:0;}
 	50% { -moz-transform:rotate(145deg); opacity:1; }
 	100% { -moz-transform:rotate(-320deg); opacity:0; }
 }
@@ -314,7 +314,7 @@ h7 {
 	100% { -moz-transform:rotate(360deg);  }
 }
 @-webkit-keyframes spinPulse {
-	0% { -webkit-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7; }
+	0% { -webkit-transform:rotate(160deg); opacity:0;}
 	50% { -webkit-transform:rotate(145deg); opacity:1;}
 	100% { -webkit-transform:rotate(-320deg); opacity:0; }
 }
@@ -362,7 +362,8 @@ button:focus {
 }
 .candidate {
     height: 70px;
-    border: 1px solid var(--color-gray);
+    border: 1px solid #E5E5E5;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
     background: white;
     text-align: center;
 }
@@ -386,7 +387,8 @@ button:focus {
     font-size: 100%;
 }
 .vote-c {
-    border: 1px solid var(--color-gray);
+    border: 1px solid #E5E5E5;
+    border-top: 1px solid rgba(0,0,0,0.03);
     background: white;
     text-align: center;
 }
