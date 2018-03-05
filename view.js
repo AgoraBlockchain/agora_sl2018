@@ -151,7 +151,7 @@ function fillTableDetail(keys,data) {
         return 0;
     });
 
-    const line = data[0];
+    const line = withPercentage(data[0]);
     constructLargeTable(sortedKeys,line);
     constructMobileTable(sortedKeys,line);
 }
@@ -169,10 +169,10 @@ function fillTableAggregegated(keys,agg) {
         return 0;
     });
 
-    const line = sortedKeys.reduce((acc,key) => {
-        acc[key] =agg[key];
+    const line = withPercentage(sortedKeys.reduce((acc,key) => {
+        acc[key] = agg[key];
         return acc;
-    },{});
+    },{}));
 
     constructLargeTable(sortedKeys,line);
     constructMobileTable(sortedKeys,line);
@@ -243,20 +243,30 @@ function constructLargeHeaders(fields) {
 // voteTd returns the td used for displaying a vote
 function voteTd(text) {
     if (text === undefined) text = "";
-    return $("<td class='vote-c'></td>").html(voteDiv(text));
+    const num = text[0];
+    const perc = text[1];
+    const html = '<div class="vote">'+num+'<br>'+perc+'%</div>';
+    return $("<td class='vote-c'></td>").html(html);
 }
 
-// voteDiv returns the div to write a vote result
-function voteDiv(text) {
-    return '<div class="vote">'+text+'</div>';
-}
 
 // candidateDiv returns the div to write to a candidate name
 function candidateDiv(text) {
     return '<div class="candidate-name">'+text+'</div>';
 }
 
-
+// withPercentage returns an array of [vote,%]
+// votes is a dictionary Cendidate => Count
+// output is a dictionary Candidate => [Count, percentage]
+function withPercentage(line) {
+    const keys = Object.keys(line);
+    const total = keys.reduce((acc,key) => acc+line[key],0);
+    return keys.reduce((acc,key) => {
+        const v = line[key];
+        acc[key] = [v,(v / total * 100).toFixed(2)];
+        return acc;
+    },{});
+}
 // displayInfo writes some info about the roster and the skipchain id the page
 // is using
 //function displayInfo(roster,genesisID) {
