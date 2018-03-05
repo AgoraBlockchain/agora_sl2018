@@ -1,0 +1,20 @@
+[[servers]]
+  Address = "tls://192.33.210.8:9900"
+  Suite = "Ed25519"
+  Public = "f57bd9f724533ef81f2f6bd648f0f52795ee0937910d2f90828ce6334aa8a36a"
+  Description = "Dedis-agora node"
+
+
+[[servers]]
+  Address = "tls://5.135.161.91:2000"
+  Suite = "Ed25519"
+  Public = "05536982805a3bc8abae93b843d30fa86b02753cdba1cbce51cebb0380cc0c39"
+  Description = "nikkolasg agora node"
+
+
+[[servers]]
+  Address = "tls://71.19.148.171:9900"
+  Suite = "Ed25519"
+  Public = "24cfadff235b5502997aaeebc94dad5c66d675af7efe069e722063bc646b1871"
+  Description = "agora.nella.org"
+

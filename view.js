@@ -193,13 +193,16 @@ function constructMobileTable(sortedKeys,line) {
     $(tableMobileId).find("thead").append(tr);
 
 
-    $(tableMobileId).find("tbody tr").remove();
     const tbody = $(tableMobileId).find("tbody");
-    sortedKeys.forEach(key => {
+    const selectedColors = fieldsToColors(sortedKeys);
+
+    $(tableMobileId).find("tbody tr").remove();
+    sortedKeys.forEach((key,idx) => {
         const tr = $("<tr></tr>");
         var vote = line[key];
         // add candidate
-        $('<td class="candidate-td"></td>').html(candidateDiv(key)).appendTo(tr);
+        const color = selectedColors[idx];
+        $('<td class="candidate-td"></td>').html(candidateTd(key,color)).appendTo(tr);
         // add vote
         voteTd(vote).appendTo(tr);
         tbody.append(tr);
@@ -218,19 +221,14 @@ function constructLargeTable(sortedKeys,line) {
 
     const selectedColors = fieldsToColors(sortedKeys);
     // returns the HTML that is put for one field and color
-    const candidateTd = function(i) {
-        const field = sortedKeys[i];
-        const color = selectedColors[i];
-        return '<div class="candidate-color" style="background:' + color +
-            ';"></div>' + candidateDiv(field);
-    };
 
     var candidateRow = $("<tr></tr>");
     var voteRow = $("<tr></tr>");
     sortedKeys.forEach((key,idx) => {
         // append candidate
+        const color = selectedColors[idx];
         const candidateCell = $('<td></td>')
-            .html(candidateTd(idx))
+            .html(candidateTd(key,color))
             .attr({class:"candidate",scope:"col"})
             .appendTo(candidateRow);
         // append vote
@@ -269,6 +267,11 @@ function constructLargeHeaders(fields) {
     }
     $(tableLargeId).find("tbody").append(tr);
 }
+
+function candidateTd(name,color) {
+    return '<div class="candidate-color" style="background:' + color +
+            ';"></div>' + candidateDiv(name);
+};
 
 // voteTd returns the td used for displaying a vote
 function voteTd(text) {
