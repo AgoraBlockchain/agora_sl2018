@@ -1,14 +1,14 @@
 // //////////////////
 // Constants
 // //////////////////
-// basePath of the sierra leone page
-const basePath = "sl2018/"
+// basePath of the sierra leone page for production setting
+const productionBasePath = "sl2018/"
 // page showing the results for the first round
-const firstRound = basePath + "results.html";
+const firstRound = productionBasePath + "results.html";
 // page showing the results for the second round
-const secondRound = basePath + "results2.html";
+const secondRound = productionBasePath + "results2.html";
 // where to find the config information to fetch the data
-const dataFolder = basePath + "data/";
+const dataFolder = "data/";
 // the url to get the roster
 const rosterURL = dataFolder + "public.toml";
 // the url to get the genesis file
@@ -117,7 +117,7 @@ function collectEthereum() {
     // get the data
     const fetchData = new Promise(function(resolve,reject) {
         $.ajax({
-            url:ethDataJson,
+            url: getBasePathFor(ethDataJson),
             dataType: "json",
             contentType: "application/json; charset=utf-8",
         }).done(function(jsonData) {
@@ -132,7 +132,7 @@ function collectEthereum() {
     // get the smart contract address
     const fetchAddress = new Promise(function(resolve,reject) {
         $.ajax({
-            url:ethContractAddr,
+            url: getBasePathFor(ethContractAddr),
             dataType: "text",
             contentType: "text/plain",
         }).done(function(address) {
@@ -252,8 +252,18 @@ function processCiscStorage(storage) {
     return parsed;
 }
 
+function getBasePathFor(file) {
+    if (isTestPage()) {
+        return file;
+    }
+    return productionBasePath + file;
+}
+
 function isTestPage() {
     if (window.location.href.match(/test.agora.vote/))
+        return true;
+
+    if (window.location.href.match("file://"))
         return true;
 
     return false;
@@ -266,7 +276,7 @@ const keyRound2 = "sl2018-2";
 // dataKey returns a different key if we are on the test page than if we are on
 // the final page
 function dataKey() {
-    if (isTestPage) {
+    if (isTestPage()) {
         return keyTest;
     }
     const url = window.location.href;
@@ -283,7 +293,7 @@ function fetchInfo() {
 
     const rosterPromise = new Promise(function(resolve,reject) {
         $.ajax({
-            url: rosterURL,
+            url: getBasePathFor(rosterURL),
             dataType: "text",
             contentType: "text/plain",
         }).done(function(roster) {
@@ -297,7 +307,7 @@ function fetchInfo() {
 
     const genesisPromise = new Promise(function(resolve,reject) {
         $.ajax({
-            url:genesisURL,
+            url: getBasePathFor(genesisURL),
             dataType: "text",
             contentType: "text/plain",
         }).done(function(roster) {
