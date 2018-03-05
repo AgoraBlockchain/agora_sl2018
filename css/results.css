@@ -376,7 +376,7 @@ button:focus {
 }
 .candidate-name {
     font-family: 'LatoWebLight';
-    font-size: 90%;
+    font-size: 40%;
 }
 .vote-c {
     border: 1px solid var(--color-gray);

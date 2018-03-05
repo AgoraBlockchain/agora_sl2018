@@ -85,10 +85,10 @@ function fillAggregated(aggregated) {
             }
             return 0;
         });
-        var n = 18;
+        /*var n = 18;
         for(var i =0; i < n;i++) {
             rows.push(["candidat"+i,i*8]);
-        }
+        }*/
 
     const selectedColors = fieldsToColors(rows);
 
