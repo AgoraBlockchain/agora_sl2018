@@ -1,6 +1,8 @@
 // colors to use to decorate the chart and the table
 const staticColors = ['#35A1EA', '#4BC0BF', '#107189', '#00C200', '#1E3798', '#808100', '#9898FE', '#8700A1', '#F11EEC', '#FF6383', '#A5FFC1', '#65FFFF', '#FFC8DE', '#E4BCFF', '#BDFF00', '#FFF031', '#FFD8AE', '#FF0000', '#9B0000', '#A26B22', '#FFCD55', '#FF9A00', '#000000', '#B7B7B7', '#FFFFFF'];
 
+const staticCandidates = ['Kandeh Conteh', 'Kandeh Yumkella', 'Samura Kamara', 'Beresford Williams', 'Charles Margai', 'Gbandi Ngobeh', 'Henry Kabuta', 'Jonathan Sandy', 'Julius Bio', 'Mohamed Sowa', 'Mohamed Mansaray', 'Mohamed C Bah', 'Musa Tarawally', "Patrick O'Dwyer", 'Samuel Sam-Sumana', 'Olufemi Claudius-Cole', 'Blank Note', 'Invalid Note'];
+
 // fillPage takes care of filling the page with the data, the fields and the
 // aggregated data
 function fillPage(data,fields,agg) {
@@ -113,7 +115,7 @@ function fillAggregated(aggregated) {
                                fontSize: 20,
                            }
                        },
-                       sliceVisibilityThreshold: 0.000002,
+                       sliceVisibilityThreshold: 0.02,
                        pieResidueSliceLabel: "Other",
                        chartArea: {
                            left: 0,
