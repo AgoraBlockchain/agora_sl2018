@@ -1,13 +1,21 @@
 // colors to use to decorate the chart and the table
 const staticColors = ['#9B0331', '#E55000', '#7D10F2', '#24955B', '#00B0DC', '#005BB0', '#F2044C', '#EC7F45', '#A051F5', '#33D582', '#5CD7F6', '#177BD9', '#F5487C', '#F5BFA2', '#CFA8FA', '#6EEFAC', '#A2E8FA', '#73AFE8', '#FBBACE', '#FCEFE7', '#E7D3FC', '#B6F7D5', '#D0F3FC', '#B9D7F3', '#879DB1'];
 
+// key representing "all" data from the drop down list
+const selectAreasAll = "Aggregated Results";
+const titleChart = "Election Results";
+
 // fillPage takes care of filling the page with the data, the fields and the
 // aggregated data
-function fillPage(data,fields,agg) {
+function fillPage(skipchainData) {
+    const data = skipchainData.data;
+    const fields = skipchainData.fields;
+    const agg = skipchainData.aggregated;
+    const areas = skipchainData.areas;
     // fill the aggregated data pie chart
     fillAggregated(agg);
     // fill select list
-    fillSelect(data,fields,agg);
+    fillSelect(data,fields,agg,areas);
     // fill the table
     var [prunedData,prunedFields] = prune(data,fields);
     // show by default the aggregated table
@@ -18,7 +26,8 @@ function fillPage(data,fields,agg) {
 // remove the first entry of each since it's polling station data
 function prune(data,fields) {
     const toPrune = fields[0];
-    const prunedFields = fields.slice(1);
+    // remove Polling station AND area
+    const prunedFields = fields.slice(2);
     const prunedData = data.map(row => {
         // take only the value for the pruned fields
         return prunedFields.reduce((acc,f) => {
@@ -29,43 +38,68 @@ function prune(data,fields) {
     return [prunedData,prunedFields];
 }
 
-// fillSelect takes a list of names to put in the selection and a callback
-// associated with each. The callback must be a function such as:
-// function(name) { ... }
-// the default will be the first name given
-function fillSelect(data,fields,agg) {
-    // selectCallback is called whenever a selection changes from the drop down
+// fillSelect creates two select list:
+//  one for the areas
+//  one for the polling stations
+function fillSelect(data,fields,agg,areas) {
+    // callbackPolls is called whenever a selection changes from the drop down
     // list of polling station names
-    const callback = function(event) {
-        const selection = $("select option:selected").text();
-        if (selection === selectKeyAll) {
-            // do not show the polling station column
-            fillTableAggregegated(fields.slice(1),agg);
-            return
-        }
-        // do not show the polling station column
+    const callbackPolls = function(event) {
+        const selection = $("#select-polling option:selected").text();
         const key = fields[0];
         const filtered = data.filter(dict => dict[key] === selection);
         var [prunedData,prunedFields] = prune(filtered,fields);
         fillTableDetail(prunedFields,prunedData);
-
     }
-    // list of all polling station names
-    const names = [selectKeyAll].concat(data.map(entry => entry[fields[0]]));
-    //const names = data.map(entry => entry[fields[0]]);
-    const select = $("#select-polling");
-    select.remove("option");
-    names.forEach((name,idx) => {
-        const html = '<div class="selection">'+name+'</div>';
-        const opt = $("<option></option>").html(html);
+
+    const callbackArea = function(event) {
+        // Hide in any case
+        const selectPolls = $("#select-polling");
+        selectPolls.contents().remove();
+        selectPolls.addClass("d-none");
+
+        const selection = $("#select-area option:selected").text();
+        if (selection === selectAreasAll) {
+            // Hide
+            fillTableAggregegated(fields.slice(2),agg);
+            return;
+        }
+
+        // list of all polling station names
+        selectPolls.change(callbackPolls);
+        const names = areas[selection];
+                names.forEach((name,idx) => {
+            const html = '<div class="selection">'+name+'</div>';
+            const opt = $("<option></option>").attr({value:name}).html(html);
+            if (idx == 0)
+                opt.attr("selected",true)
+
+            opt.appendTo(selectPolls);
+        });
+        // trigger the polling names
+        selectPolls.val(names[0]).trigger('change');
+        $("#select-polling").removeClass("d-none");
+    }
+
+    /////////////////////
+    // areas select
+    // //////////////////
+    const areaNames = [selectAreasAll].concat(Object.keys(areas));
+    const selectAreas = $("#select-area");
+    // clear any previous options
+    selectAreas.contents().remove();
+    selectAreas.change(callbackArea);
+    areaNames.forEach((area,idx) => {
+        const html = '<div class="selection-area">'+area+'</div>';
+        const opt = $("<option></option>").attr({value:area}).html(html);
         if (idx == 0)
             opt.attr("selected",true)
 
-        opt.appendTo(select);
+        opt.appendTo(selectAreas);
     });
-    select.change(callback);
+    // call it first
+    selectAreas.val(selectAreasAll).trigger('change');
 }
-
 
 // fieldsToColors makes a deterministic mapping from a field name to a color
 // the same color is used to draw the table and the chart
