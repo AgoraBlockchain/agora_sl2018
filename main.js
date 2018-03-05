@@ -1,14 +1,15 @@
 // //////////////////
 // Constants
 // //////////////////
+const dataFolder = "data/";
 // the url to get the roster
-const rosterURL = "public.toml";
+const rosterURL = dataFolder + "public.toml";
 // the url to get the genesis file
-const genesisURL = "genesis.txt";
+const genesisURL = dataFolder + "genesis.txt";
 // ethereum data.json
-const ethDataJson = "data.json";
-const ethContractAddr = "contract.address";
-const ethContractAbi = "contract.abi";
+const ethDataJson = dataFolder + "data.json";
+const ethContractAddr = dataFolder + "contract.address";
+const ethContractAbi = dataFolder + "contract.abi";
 
 // key representing "all" data from the drop down list
 const selectKeyAll = "All polling stations";
