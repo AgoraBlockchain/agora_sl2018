@@ -14,7 +14,6 @@ function fillPage(skipchainData) {
     const areas = skipchainData.areas;
     const sortedFields = fields.slice();
     var [prunedData, prunedFields] = prune(data, fields);
-    const colors = fieldsToColors(prunedFields);
     prunedFields.sort(function (a, b) {
         var va = agg[a];
         var vb = agg[b];
@@ -24,6 +23,7 @@ function fillPage(skipchainData) {
             return -1;
         return 0;
     });
+    const colors = fieldsToColors(prunedFields);
     const global = {
         data: data,
         fields: fields,
