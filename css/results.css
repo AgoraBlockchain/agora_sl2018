@@ -379,7 +379,10 @@ button:focus {
     outline: none;
 }
 
-.selection {
+.selection,
+.selection-area {
+    text-align: center;
+    text-align-last:center;
 }
 #results-table {
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16);
@@ -419,4 +422,11 @@ button:focus {
 .vote {
     font-family: 'LatoWebLight';
     font-size: 90%;
+}
+
+
+.logo {
+    display: block;
+    margin: auto;
+    max-width: 90px;
 }
