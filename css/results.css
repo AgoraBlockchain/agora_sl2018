@@ -283,7 +283,7 @@ h7 {
 .loading-t {
     position: absolute;
     top: calc(50% + 50px);
-    left: calc(50% - 128px);
+    left: calc(50% - 160px);
 }
 .circle {
     position: absolute;
@@ -334,6 +334,11 @@ h7 {
 	100% { -webkit-transform:rotate(360deg); }
 }
 
+.sierra-leone-flag {
+    width: 111px;
+    height: 74px;
+}
+
 #piechart {
   width: 100%;
   height: 300px;
@@ -355,6 +360,7 @@ section {
     background: linear-gradient(#FDFBFB,#F5F7FA);
 }
 
+#select-area,
 #select-polling {
     border: 1;
     outline: none;
@@ -373,7 +379,10 @@ button:focus {
     outline: none;
 }
 
-.selection {
+.selection,
+.selection-area {
+    text-align: center;
+    text-align-last:center;
 }
 #results-table {
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16);
@@ -413,4 +422,11 @@ button:focus {
 .vote {
     font-family: 'LatoWebLight';
     font-size: 90%;
+}
+
+
+.logo {
+    display: block;
+    margin: auto;
+    max-width: 90px;
 }

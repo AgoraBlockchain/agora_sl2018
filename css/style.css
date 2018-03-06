@@ -317,6 +317,17 @@ section {
     top: calc(50% - 15px);
 }
 
+@media (min-width:992px) {
+    #main .t-left {
+        margin-left: -70px;
+    }
+}
+@media (min-width:992px) {
+    #main .t-right {
+        margin-left: 70px;
+    }
+}
+
 /*LINES*/
 
 .line {
@@ -413,39 +424,14 @@ section {
 
 
 .main-l6 {
-    left: 0;
-    width: 90%;
+    right: 10%;
+    width: 85%;
     top: calc(50% - 2px);
-}
-
-.main-l7 {
-    left: 33.333%;
-    height: calc(50% + 2px);
-    top: calc(50% - 2px);
-}
-
-
-.main-l8 {
-    left: 33.333%;
-    height: calc(50% + 2px);
-    top: 0;
 }
 
 .main-l9 {
     left: 10%;
-    width: 90%;
-    top: calc(50% - 2px);
-}
-
-.main-l10 {
-    left: 50%;
-    height: calc(50% - 2px);
-    top: 0;
-}
-
-.main-l11 {
-    right: 20%;
-    height: calc(50% - 2px);
+    width: 85%;
     top: calc(50% - 2px);
 }
 

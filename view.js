@@ -1,5 +1,5 @@
 // colors to use to decorate the chart and the table
-const staticColors = ['#9B0331', '#E55000', '#7D10F2', '#24955B', '#00B0DC', '#005BB0', '#F2044C', '#EC7F45', '#A051F5', '#33D582', '#5CD7F6', '#177BD9', '#F5487C', '#F5BFA2', '#CFA8FA', '#6EEFAC', '#A2E8FA', '#73AFE8', '#FBBACE', '#FCEFE7', '#E7D3FC', '#B6F7D5', '#D0F3FC', '#B9D7F3', '#879DB1'];
+const staticColors = ['#005BB0', '#177BD9', '#73AFE8', '#B9D7F3', '#00B0DC', '#5CD7F6', '#A2E8FA', '#D0F3FC', '#24955B', '#33D582', '#6EEFAC', '#B6F7D5', '#7D10F2', '#A051F5', '#CFA8FA', '#E7D3FC', '#E55000', '#EC7F45', '#F5BFA2', '#FCEFE7', '#9B0331', '#F2044C', '#F5487C', '#FBBACE', '#879DB1'];
 
 // key representing "all" data from the drop down list
 const selectAreasAll = "Aggregated Results";
