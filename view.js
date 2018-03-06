@@ -61,11 +61,11 @@ function aggregateData(data,fields) {
     }, {});
 }
 
-
+//
 function sortAggregatedFields(agg,fields) {
-    // arr2.reduce((acc,key) => { acc[key] = di.map(entry => entry[key]).reduce((a,b) => a+b,0); return acc },{})
-    fields.sort(function (a, b) {
-        var va = agg[a];
+    const copy = fields.slice();
+    copy.sort(function (a, b) {
+                var va = agg[a];
         var vb = agg[b];
         if (va < vb)
             return 1;
@@ -73,6 +73,52 @@ function sortAggregatedFields(agg,fields) {
             return -1;
         return 0;
     });
+    setStaticFields(copy);
+    return copy;
+}
+
+const blankNoteID = "Blank Note";
+const invalidNoteID = "Invalid Note";
+
+function sortDetailledFields(row,fields) {
+    const copy = fields.slice();
+    copy.sort(function (a, b) {
+        if (a == blankNoteID || a == invalidNoteID)
+            return 1;
+
+        if (b == blankNoteID || b == invalidNoteID)
+            return -1;
+
+        var va = row[a];
+        var vb = row[b];
+
+        if (va < vb)
+            return 1;
+        if (va > vb)
+            return -1;
+        return 0;
+    });
+    setStaticFields(copy);
+    return copy;
+}
+
+// setStaticFields puts the fields invalidNoteID and blankNoteID at the end in a
+// deterministic order
+function setStaticFields(copy) {
+    const length = copy.length;
+    for(var i = 0; i < length-1; i++) {
+        const v = copy[i];
+        if (v == blankNoteID) {
+            copy[i] = copy[length-2];
+            copy[length-2] = v;
+            continue;
+        }
+        if (v == invalidNoteID) {
+            copy[i] = copy[length-1];
+            copy[length-1] = v;
+            continue;
+        }
+    }
 }
 
 // remove the first two entry of each since it's polling station data
@@ -118,12 +164,9 @@ function fillSelect(global) {
         // show aggregted poll stations from the area
         if (pollSelection === selectPollsAll) {
             const polls = areas[areaSelection];
-            console.log("selected polls: ",polls);
-            console.log("fields[0] : ",fields[0]);
             const filteredData = data.filter(row => polls.includes(row[fields[0]]));
             const prunedData = pruneData(filteredData,prunedFields);
             const pollAgg = aggregateData(prunedData,prunedFields);
-            sortAggregatedFields(pollAgg,prunedFields);
             fillTableAggregegated(prunedFields,pollAgg,colors);
             return;
         }
@@ -273,7 +316,7 @@ function fillAggregated(global) {
     }
 
     $(window).resize(function () {
-            drawChart();
+        drawChart();
     });
     // Set a callback to run when the Google Visualization API is loaded.
     google.charts.setOnLoadCallback(drawChart);
@@ -284,18 +327,7 @@ const tableMobileId = "#results-table-mobile";
 
 // fillTableDetail constructs the detailled table
 function fillTableDetail(keys, data,colors) {
-    const sortedKeys = keys.slice();
-    // sort for each row to print
-    sortedKeys.sort(function (a, b) {
-        var va = data[0][a];
-        var vb = data[0][b];
-        if (va < vb)
-            return 1;
-        if (va > vb)
-            return -1;
-        return 0;
-    });
-
+    const sortedKeys = sortDetailledFields(data,keys);
     const line = withPercentage(data[0]);
     const selectedColors = sortedKeys.map(c => colors[c]);
     constructLargeTable(sortedKeys, line,selectedColors);
@@ -303,13 +335,9 @@ function fillTableDetail(keys, data,colors) {
 }
 
 // fillTableAggregegated constructs the aggregated table
-function fillTableAggregegated(sortedFields, agg, colors) {
-    const line = withPercentage(agg)
-    /*const line = withPercentage(sortedFields.reduce((acc, key) => {*/
-        //acc[key] = agg[key];
-        //return acc;
-    //}, {}));
-
+function fillTableAggregegated(fields, agg, colors) {
+    const sortedFields = sortAggregatedFields(agg,fields);
+    const line = withPercentage(agg);
     const selectedColors = sortedFields.map(c => colors[c]);
     constructLargeTable(sortedFields, line,selectedColors);
     constructMobileTable(sortedFields, line,selectedColors);
