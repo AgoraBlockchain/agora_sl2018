@@ -12,20 +12,39 @@ function fillPage(skipchainData) {
     const fields = skipchainData.fields;
     const agg = skipchainData.aggregated;
     const areas = skipchainData.areas;
-    // fill the aggregated data pie chart
-    fillAggregated(agg);
-    // fill select list
-    fillSelect(data,fields,agg,areas);
-    // fill the table
+    const sortedFields = fields.slice();
     var [prunedData, prunedFields] = prune(data, fields);
+    prunedFields.sort(function (a, b) {
+        var va = agg[a];
+        var vb = agg[b];
+        if (va < vb)
+            return 1;
+        if (va > vb)
+            return -1;
+        return 0;
+    });
+    const colors = fieldsToColors(prunedFields);
+    const global = {
+        data: data,
+        fields: fields,
+        agg: agg,
+        areas: areas,
+        sortedFields: prunedFields,
+        colors: colors,
+    }
+    // fill the aggregated data pie chart
+    fillAggregated(global);
+    // fill select list
+    //fillSelect(data,fields,agg,areas);
+    fillSelect(global);
+    // fill the table
     // show by default the aggregated table
-    fillTableAggregegated(prunedFields, agg);
+    fillTableAggregegated(prunedFields, agg,colors);
     hideWaitingDialog();
 }
 
 // remove the first entry of each since it's polling station data
 function prune(data, fields) {
-    const toPrune = fields[0];
     // remove Polling station AND area
     const prunedFields = fields.slice(2);
     const prunedData = data.map(row => {
@@ -41,7 +60,14 @@ function prune(data, fields) {
 // fillSelect creates two select list:
 //  one for the areas
 //  one for the polling stations
-function fillSelect(data,fields,agg,areas) {
+function fillSelect(global) {
+    const data = global.data;
+    const fields = global.fields;
+    const agg = global.agg;
+    const areas = global.areas;
+    const sortedFields = global.sortedFields;
+    const colors = global.colors;
+
     // callbackPolls is called whenever a selection changes from the drop down
     // list of polling station names
     const callbackPolls = function(event) {
@@ -49,7 +75,7 @@ function fillSelect(data,fields,agg,areas) {
         const key = fields[0];
         const filtered = data.filter(dict => dict[key] === selection);
         var [prunedData,prunedFields] = prune(filtered,fields);
-        fillTableDetail(prunedFields,prunedData);
+        fillTableDetail(prunedFields,prunedData,colors);
     }
 
     const callbackArea = function(event) {
@@ -61,7 +87,8 @@ function fillSelect(data,fields,agg,areas) {
         const selection = $("#select-area option:selected").text();
         if (selection === selectAreasAll) {
             // Hide
-            fillTableAggregegated(fields.slice(2),agg);
+            //fillTableAggregegated(fields.slice(2),agg,colors);
+            fillTableAggregegated(sortedFields,agg,colors);
             return;
         }
 
@@ -103,28 +130,19 @@ function fillSelect(data,fields,agg,areas) {
 
 // fieldsToColors makes a deterministic mapping from a field name to a color
 // the same color is used to draw the table and the chart
-function fieldsToColors(fields) {
-    return fields.map((v, i) => staticColors[i]);
+function fieldsToColors(candidates) {
+    const mapping = {};
+    candidates.forEach((candidate,idx) => {
+        mapping[candidate] = staticColors[idx];
+    });
+    return mapping;
 }
 // fill the aggregated textarea => TO CHANGE with a nice graph
-function fillAggregated(aggregated) {
-    // sort by vote
-    const rows = Object.keys(aggregated).map(key => [key.trim(), aggregated[key]])
-        .sort(function (a, b) {
-            if (a[1] < b[1]) {
-                return 1;
-            }
-            if (a[1] > b[1]) {
-                return -1;
-            }
-            return 0;
-        });
-    /*var n = 18;
-    for(var i =0; i < n;i++) {
-        rows.push(["candidat"+i,i*8]);
-    }*/
-
-    const selectedColors = fieldsToColors(rows);
+function fillAggregated(global) {
+    // take sorted by vote
+    // [candidate, vote]
+    const rows = global.sortedFields.map(c => [c.trim(), global.agg[c]])
+    const selectedColors = global.sortedFields.map(c => global.colors[c]);
 
     const drawChart = function () {
         // create the data table.
@@ -210,8 +228,9 @@ const tableLargeId = "#results-table";
 const tableMobileId = "#results-table-mobile";
 
 // fillTableDetail constructs the detailled table
-function fillTableDetail(keys, data) {
+function fillTableDetail(keys, data,colors) {
     const sortedKeys = keys.slice();
+    // sort for each row to print
     sortedKeys.sort(function (a, b) {
         var va = data[0][a];
         var vb = data[0][b];
@@ -223,36 +242,27 @@ function fillTableDetail(keys, data) {
     });
 
     const line = withPercentage(data[0]);
-    constructLargeTable(sortedKeys, line);
-    constructMobileTable(sortedKeys, line);
+    const selectedColors = sortedKeys.map(c => colors[c]);
+    constructLargeTable(sortedKeys, line,selectedColors);
+    constructMobileTable(sortedKeys, line,selectedColors);
 }
 
 // fillTableAggregegated constructs the aggregated table
-function fillTableAggregegated(keys, agg) {
-    const sortedKeys = keys.slice();
-    sortedKeys.sort(function (a, b) {
-        var va = agg[a];
-        var vb = agg[b];
-        if (va < vb)
-            return 1;
-        if (va > vb)
-            return -1;
-        return 0;
-    });
+function fillTableAggregegated(sortedFields, agg, colors) {
+    const line = withPercentage(agg)
+    /*const line = withPercentage(sortedFields.reduce((acc, key) => {*/
+        //acc[key] = agg[key];
+        //return acc;
+    //}, {}));
 
-    const line = withPercentage(sortedKeys.reduce((acc, key) => {
-        acc[key] = agg[key];
-        return acc;
-    }, {}));
-
-    constructLargeTable(sortedKeys, line);
-    constructMobileTable(sortedKeys, line);
+    const selectedColors = sortedFields.map(c => colors[c]);
+    constructLargeTable(sortedFields, line,selectedColors);
+    constructMobileTable(sortedFields, line,selectedColors);
 }
 
 // constructMobileTable creates the table a  mobile screen
-function constructMobileTable(sortedKeys, line) {
+function constructMobileTable(sortedKeys, line, selectedColors) {
     const tbody = $(tableMobileId).find("tbody");
-    const selectedColors = fieldsToColors(sortedKeys);
 
     $(tableMobileId).find("tbody tr").remove();
     sortedKeys.forEach((key, idx) => {
@@ -271,13 +281,12 @@ function constructMobileTable(sortedKeys, line) {
 const wrapOverCell = 8;
 
 // constructLargeTable creates the table for a large screen
-function constructLargeTable(sortedKeys, line) {
+function constructLargeTable(sortedKeys, line,selectedColors) {
     //constructLargeHeaders(sortedKeys);
 
     const tableBody = $(tableLargeId).find("tbody");
     tableBody.find("tr").remove();
 
-    const selectedColors = fieldsToColors(sortedKeys);
     // returns the HTML that is put for one field and color
 
     var candidateRow = $("<tr></tr>");
