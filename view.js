@@ -3,6 +3,7 @@ const staticColors = ['#005BB0', '#177BD9', '#73AFE8', '#B9D7F3', '#00B0DC', '#5
 
 // key representing "all" data from the drop down list
 const selectAreasAll = "All Areas";
+const selectPollsAll = "All Polling Stations";
 const titleChart = "Election Results";
 
 // fillPage takes care of filling the page with the data, the fields and the
@@ -33,7 +34,7 @@ function fillPage(skipchainData) {
         colors: colors,
     }
     // fill the aggregated data pie chart
-    fillAggregated(global);
+    //fillAggregated(global);
     // fill select list
     //fillSelect(data,fields,agg,areas);
     fillSelect(global);
@@ -43,18 +44,58 @@ function fillPage(skipchainData) {
     hideWaitingDialog();
 }
 
-// remove the first entry of each since it's polling station data
+// aggregateData returns an aggregated version of all the datas. It computes the
+// sum for each candidate for each pollign stations.
+// data is expected to be an array of dictionary where each item represents the
+// data of one pollign station
+// Fields are the fields to aggregate. All candidate1 values will be aggregated
+// together for example.
+// NOTE: fields MUST NOT INCLUDE the polling station column, i.e. the first
+// column of the csv
+function aggregateData(data,fields) {
+    const aggregated = {};
+    // arr2.reduce((acc,key) => { acc[key] = di.map(entry => entry[key]).reduce((a,b) => a+b,0); return acc },{})
+    return fields.reduce((acc,key) => {
+        acc[key] = data.map(entry => entry[key]).reduce((a,b) => a+b,0);
+        return acc;
+    }, {});
+}
+
+
+function sortAggregatedFields(agg,fields) {
+    // arr2.reduce((acc,key) => { acc[key] = di.map(entry => entry[key]).reduce((a,b) => a+b,0); return acc },{})
+    fields.sort(function (a, b) {
+        var va = agg[a];
+        var vb = agg[b];
+        if (va < vb)
+            return 1;
+        if (va > vb)
+            return -1;
+        return 0;
+    });
+}
+
+// remove the first two entry of each since it's polling station data
 function prune(data, fields) {
     // remove Polling station AND area
-    const prunedFields = fields.slice(2);
-    const prunedData = data.map(row => {
+    const prunedFields = pruneFields(fields);
+    const prunedDataa = pruneData(data,prunedFields);
+    return [prunedDataa, prunedFields];
+}
+
+function pruneData(data,prunedFields) {
+    return data.map(row => {
         // take only the value for the pruned fields
         return prunedFields.reduce((acc, f) => {
             acc[f] = row[f];
             return acc;
         }, {});
     });
-    return [prunedData, prunedFields];
+
+}
+
+function pruneFields(fields) {
+    return fields.slice(2);
 }
 
 // fillSelect creates two select list:
@@ -67,14 +108,28 @@ function fillSelect(global) {
     const areas = global.areas;
     const sortedFields = global.sortedFields;
     const colors = global.colors;
-
+    const [prunedData,prunedFields] = prune(data,fields);
     // callbackPolls is called whenever a selection changes from the drop down
     // list of polling station names
     const callbackPolls = function(event) {
-        const selection = $("#select-polling option:selected").text();
+        const prunedFields = pruneFields(fields);
+        const pollSelection = $("#select-polling option:selected").text();
+        const areaSelection = $("#select-area option:selected").text();
+        // show aggregted poll stations from the area
+        if (pollSelection === selectPollsAll) {
+            const polls = areas[areaSelection];
+            console.log("selected polls: ",polls);
+            console.log("fields[0] : ",fields[0]);
+            const filteredData = data.filter(row => polls.includes(row[fields[0]]));
+            const prunedData = pruneData(filteredData,prunedFields);
+            const pollAgg = aggregateData(prunedData,prunedFields);
+            sortAggregatedFields(pollAgg,prunedFields);
+            fillTableAggregegated(prunedFields,pollAgg,colors);
+            return;
+        }
         const key = fields[0];
-        const filtered = data.filter(dict => dict[key] === selection);
-        var [prunedData,prunedFields] = prune(filtered,fields);
+        const filtered = data.filter(dict => dict[key] === pollSelection);
+        var prunedData = pruneData(filtered,prunedFields);
         fillTableDetail(prunedFields,prunedData,colors);
     }
 
@@ -94,8 +149,8 @@ function fillSelect(global) {
 
         // list of all polling station names
         selectPolls.change(callbackPolls);
-        const names = areas[selection];
-                names.forEach((name,idx) => {
+        const names = [selectPollsAll].concat(areas[selection]);
+        names.forEach((name,idx) => {
             const html = '<div class="selection">'+name+'</div>';
             const opt = $("<option></option>").attr({value:name}).html(html);
             if (idx == 0)
