@@ -2,7 +2,7 @@
 const staticColors = ['#005BB0', '#177BD9', '#73AFE8', '#B9D7F3', '#00B0DC', '#5CD7F6', '#A2E8FA', '#D0F3FC', '#24955B', '#33D582', '#6EEFAC', '#B6F7D5', '#7D10F2', '#A051F5', '#CFA8FA', '#E7D3FC', '#E55000', '#EC7F45', '#F5BFA2', '#FCEFE7', '#9B0331', '#F2044C', '#F5487C', '#FBBACE', '#879DB1'];
 
 // key representing "all" data from the drop down list
-const selectAreasAll = "Aggregated Results";
+const selectAreasAll = "All Areas";
 const titleChart = "Election Results";
 
 // fillPage takes care of filling the page with the data, the fields and the
