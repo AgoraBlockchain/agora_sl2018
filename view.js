@@ -64,7 +64,6 @@ function aggregateData(data,fields) {
 //
 function sortAggregatedFields(agg,fields) {
     const copy = removeStaticFields(fields);
-    console.log("sortAggregatedFields: fields ",fields, " => ", copy);
     copy.sort(function (a, b) {
         var va = agg[a];
         var vb = agg[b];
@@ -76,7 +75,6 @@ function sortAggregatedFields(agg,fields) {
     });
     copy.push(blankNoteID);
     copy.push(invalidNoteID);
-    console.log("sortAggregatedFields #2: fields ",fields, " => ", copy);
     return copy;
 }
 
