@@ -14,7 +14,7 @@ cisc kv file "$csv" --key "$key"
 
 # add to ethereum
 cd geens/cli
-node index ../../"$csv"
+nodejs index ../../"$csv"
 cp data.json ../../data/data.json
 
 # go back and upload git
