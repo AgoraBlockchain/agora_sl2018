@@ -8,6 +8,10 @@
     --color-black: #3E3E3E;
 }
 
+svg > g > g:last-child { 
+    pointer-events: none;
+}
+
 .color-agora,
 .color-agora:hover,
 .color-agora:visited {
