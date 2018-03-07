@@ -2,7 +2,7 @@
 // Constants
 // //////////////////
 // basePath of the sierra leone page for production setting
-const productionBasePath = "sl2018/"
+const productionBasePath = "sierraleone2018/"
 // page showing the results for the first round
 const firstRound = productionBasePath + "results.html";
 // page showing the results for the second round
