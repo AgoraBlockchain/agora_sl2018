@@ -63,9 +63,10 @@ function aggregateData(data,fields) {
 
 //
 function sortAggregatedFields(agg,fields) {
-    const copy = fields.slice();
+    const copy = removeStaticFields(fields);
+    console.log("sortAggregatedFields: fields ",fields, " => ", copy);
     copy.sort(function (a, b) {
-                var va = agg[a];
+        var va = agg[a];
         var vb = agg[b];
         if (va < vb)
             return 1;
@@ -73,22 +74,18 @@ function sortAggregatedFields(agg,fields) {
             return -1;
         return 0;
     });
-    setStaticFields(copy);
+    copy.push(blankNoteID);
+    copy.push(invalidNoteID);
+    console.log("sortAggregatedFields #2: fields ",fields, " => ", copy);
     return copy;
 }
 
-const blankNoteID = "Blank Vote";
-const invalidNoteID = "Invalid Vote";
+const blankNoteID = "Blank Note";
+const invalidNoteID = "Invalid Note";
 
 function sortDetailledFields(row,fields) {
-    const copy = fields.slice();
+    const copy = removeStaticFields(fields);
     copy.sort(function (a, b) {
-        if (a == blankNoteID || a == invalidNoteID)
-            return 1;
-
-        if (b == blankNoteID || b == invalidNoteID)
-            return -1;
-
         var va = row[a];
         var vb = row[b];
 
@@ -98,27 +95,21 @@ function sortDetailledFields(row,fields) {
             return -1;
         return 0;
     });
-    setStaticFields(copy);
+    copy.push(blankNoteID);
+    copy.push(invalidNoteID);
     return copy;
 }
 
-// setStaticFields puts the fields invalidNoteID and blankNoteID at the end in a
+// addStaticField puts the fields invalidNoteID and blankNoteID at the end in a
 // deterministic order
-function setStaticFields(copy) {
-    const length = copy.length;
-    for(var i = 0; i < length-1; i++) {
-        const v = copy[i];
-        if (v == blankNoteID) {
-            copy[i] = copy[length-2];
-            copy[length-2] = v;
-            continue;
-        }
-        if (v == invalidNoteID) {
-            copy[i] = copy[length-1];
-            copy[length-1] = v;
-            continue;
-        }
-    }
+function addStaticField(copy) {
+    copy.push(blankNoteID);
+    copy.push(invalidNoteID);
+}
+
+function removeStaticFields(fields) {
+    var copy = fields.slice();
+    return copy.filter(v => (v != invalidNoteID && v != blankNoteID))
 }
 
 // remove the first two entry of each since it's polling station data
