@@ -34,7 +34,7 @@ function fillPage(skipchainData) {
         colors: colors,
     }
     // fill the aggregated data pie chart
-    //fillAggregated(global);
+    fillChart(global);
     // fill select list
     //fillSelect(data,fields,agg,areas);
     fillSelect(global);
@@ -236,7 +236,7 @@ function fieldsToColors(candidates) {
     return mapping;
 }
 // fill the aggregated textarea => TO CHANGE with a nice graph
-function fillAggregated(global) {
+function fillChart(global) {
     // take sorted by vote
     // [candidate, vote]
     const rows = global.sortedFields.map(c => [c.trim(), global.agg[c]])
