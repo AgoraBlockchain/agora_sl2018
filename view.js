@@ -77,8 +77,8 @@ function sortAggregatedFields(agg,fields) {
     return copy;
 }
 
-const blankNoteID = "Blank Note";
-const invalidNoteID = "Invalid Note";
+const blankNoteID = "Blank Vote";
+const invalidNoteID = "Invalid Vote";
 
 function sortDetailledFields(row,fields) {
     const copy = fields.slice();
