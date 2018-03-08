@@ -286,8 +286,12 @@ h7 {
 
 .loading-t {
     position: absolute;
+    left: 0; 
+    right: 0; 
+    margin-left: auto; 
+    margin-right: auto; 
     top: calc(50% + 50px);
-    left: calc(50% - 160px);
+    width: 220px; /* Need a specific value to work */
 }
 .circle {
     position: absolute;
