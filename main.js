@@ -280,7 +280,7 @@ function isTestPage() {
 }
 
 const keyTest = "test";
-const keyRound1 = "sl2018-1";
+const keyRound1 = '"sl2018-1"';
 const keyRound2 = "sl2018-2";
 
 // dataKey returns a different key if we are on the test page than if we are on
