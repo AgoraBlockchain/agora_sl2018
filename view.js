@@ -13,15 +13,19 @@ function fillPage(skipchainData) {
     const fields = skipchainData.fields;
     const agg = skipchainData.aggregated;
     const areas = skipchainData.areas;
-    const sortedFields = fields.slice();
+    //const sortedFields = fields.slice();
     var [prunedData, prunedFields] = prune(data, fields);
-    const colors = fieldsToColors(prunedFields);
+
+    var sortedFields = sortAggregatedFields(agg,prunedFields);
+    console.log("sortedfields = ",sortedFields);
+    const colors = fieldsToColors(sortedFields);
+
     const global = {
         data: data,
         fields: fields,
         agg: agg,
         areas: areas,
-        sortedFields: prunedFields,
+        sortedFields: sortedFields,
         colors: colors,
     }
     // fill the aggregated data pie chart
@@ -64,7 +68,6 @@ function sortAggregatedFields(agg,fields) {
             return -1;
         return 0;
     });
-    copy.push(blankNoteID);
     copy.push(invalidNoteID);
     return copy;
 }
@@ -84,7 +87,6 @@ function sortDetailledFields(row,fields) {
             return -1;
         return 0;
     });
-    copy.push(blankNoteID);
     copy.push(invalidNoteID);
     return copy;
 }
@@ -92,7 +94,6 @@ function sortDetailledFields(row,fields) {
 // addStaticField puts the fields invalidNoteID and blankNoteID at the end in a
 // deterministic order
 function addStaticField(copy) {
-    copy.push(blankNoteID);
     copy.push(invalidNoteID);
 }
 
