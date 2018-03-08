@@ -11,14 +11,11 @@ const titleChart = "Election Results";
 function fillPage(skipchainData) {
     const data = skipchainData.data;
     const fields = skipchainData.fields;
-    //const agg = skipchainData.aggregated;
     const areas = skipchainData.areas;
-    //const sortedFields = fields.slice();
     var [prunedData, prunedFields] = prune(data, fields);
     const agg = aggregateData(prunedData,prunedFields);
     var sortedFields = sortAggregatedFields(agg,prunedFields);
     const colors = fieldsToColors(sortedFields);
-
     const global = {
         data: data,
         fields: fields,
@@ -221,7 +218,7 @@ function fillChart(global) {
     // [candidate, vote]
     // remove invalidNote
     var pruned = pruneFields(global.fields);
-    var sortedFields = sortAggregatedFields(global.agg,pruned);
+    var sortedFields = formatFields(sortAggregatedFields(global.agg,pruned));
     //var pruned = sortedFields.slice().filter(v => v != invalidNoteID);
     var pruned = sortedFields;
     const rows = pruned.map(c => [c.trim(), global.agg[c]])
@@ -310,9 +307,18 @@ function fillChart(global) {
 const tableLargeId = "#results-table";
 const tableMobileId = "#results-table-mobile";
 
+// formatFields returns the candidate name with a <br> before the political
+// party name
+function formatFields(fields) {
+    return fields.map(f => {
+        const idx = f.indexOf("(");
+        return f.slice(0,idx-1) + "<br>" + f.slice(idx);
+    });
+}
+
 // fillTableDetail constructs the detailled table
 function fillTableDetail(keys, line,colors) {
-    const sortedKeys = sortDetailledFields(line,keys);
+    const sortedKeys = formatFields(sortDetailledFields(line,keys));
     const lineP= withPercentage(line);
     const selectedColors = sortedKeys.map(c => colors[c]);
     constructLargeTable(sortedKeys, lineP,selectedColors);
@@ -321,7 +327,7 @@ function fillTableDetail(keys, line,colors) {
 
 // fillTableAggregegated constructs the aggregated table
 function fillTableAggregegated(fields, agg, colors) {
-    const sortedFields = sortAggregatedFields(agg,fields);
+    const sortedFields = formatFields(sortAggregatedFields(agg,fields));
     const line = withPercentage(agg);
     const selectedColors = sortedFields.map(c => colors[c]);
     constructLargeTable(sortedFields, line,selectedColors);
