@@ -310,15 +310,16 @@ const tableMobileId = "#results-table-mobile";
 // formatFields returns the candidate name with a <br> before the political
 // party name
 function formatFields(fields) {
-    return fields.map(f => {
-        const idx = f.indexOf("(");
-        return f.slice(0,idx-1) + "<br>" + f.slice(idx);
-    });
+    return fields.map(f => formatField(f);
 }
 
+function formatField(f) {
+   const idx = f.indexOf("(");
+   return f.slice(0,idx-1) + "<br>" + f.slice(idx);
+}
 // fillTableDetail constructs the detailled table
 function fillTableDetail(keys, line,colors) {
-    const sortedKeys = formatFields(sortDetailledFields(line,keys));
+    const sortedKeys = sortDetailledFields(line,keys);
     const lineP= withPercentage(line);
     const selectedColors = sortedKeys.map(c => colors[c]);
     constructLargeTable(sortedKeys, lineP,selectedColors);
@@ -327,7 +328,7 @@ function fillTableDetail(keys, line,colors) {
 
 // fillTableAggregegated constructs the aggregated table
 function fillTableAggregegated(fields, agg, colors) {
-    const sortedFields = formatFields(sortAggregatedFields(agg,fields));
+    const sortedFields = sortAggregatedFields(agg,fields);
     const line = withPercentage(agg);
     const selectedColors = sortedFields.map(c => colors[c]);
     constructLargeTable(sortedFields, line,selectedColors);
@@ -417,7 +418,7 @@ function constructLargeHeaders(fields) {
 
 function candidateTd(name, color) {
     return '<div class="candidate-color" style="background:' + color +
-        ';"></div>' + candidateDiv(name);
+        ';"></div>' + candidateDiv(formatField(name));
 };
 
 // voteTd returns the td used for displaying a vote
