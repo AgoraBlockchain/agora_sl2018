@@ -17,7 +17,6 @@ function fillPage(skipchainData) {
     var [prunedData, prunedFields] = prune(data, fields);
 
     var sortedFields = sortAggregatedFields(agg,prunedFields);
-    console.log("sortedfields = ",sortedFields);
     const colors = fieldsToColors(sortedFields);
 
     const global = {
@@ -113,7 +112,7 @@ function prune(data, fields) {
 function pruneData(data,prunedFields) {
     return data.map(row => {
         // take only the value for the pruned fields
-        return prunedFields.reduce((acc, f) => {
+        prunedFields.reduce((acc, f) => {
             acc[f] = row[f];
             return acc;
         }, {});
@@ -146,6 +145,9 @@ function fillSelect(global) {
             const polls = areas[areaSelection];
             const filteredData = data.filter(row => polls.includes(row[fields[0]]));
             const prunedData = pruneData(filteredData,prunedFields);
+            console.log("before aggregatedDAta: filteredData:",filteredData);
+            console.log("before aggregatedDAta: prunedFields:",prunedFields);
+            console.log("before aggregatedDAta: prunedData:",prunedData);
             const pollAgg = aggregateData(prunedData,prunedFields);
             fillTableAggregegated(prunedFields,pollAgg,colors);
             return;
@@ -153,7 +155,7 @@ function fillSelect(global) {
         const key = fields[0];
         const filtered = data.filter(dict => dict[key] === pollSelection);
         var prunedData = pruneData(filtered,prunedFields);
-        fillTableDetail(prunedFields,prunedData,colors);
+        fillTableDetail(prunedFields,prunedData[0],colors);
     }
 
     const callbackArea = function(event) {
@@ -222,9 +224,7 @@ function fillChart(global) {
     // remove invalidNote
     var pruned = pruneFields(global.fields);
     var sortedFields = sortAggregatedFields(global.agg,pruned);
-    console.log("sortedfields = ",sortedFields);
     var pruned = sortedFields.slice().filter(v => v != invalidNoteID);
-    console.log("pruned = ",pruned);
     const rows = pruned.map(c => [c.trim(), global.agg[c]])
     const selectedColors = pruned.map(c => global.colors[c]);
 
@@ -312,12 +312,15 @@ const tableLargeId = "#results-table";
 const tableMobileId = "#results-table-mobile";
 
 // fillTableDetail constructs the detailled table
-function fillTableDetail(keys, data,colors) {
-    const sortedKeys = sortDetailledFields(data,keys);
-    const line = withPercentage(data[0]);
+function fillTableDetail(keys, line,colors) {
+    const sortedKeys = sortDetailledFields(line,keys);
+    console.log("filTableDetails => data",line);
+    console.log("filTableDetails => keys",keys);
+    console.log("filTableDetails => keys",sortedKeys);
+    const lineP= withPercentage(line);
     const selectedColors = sortedKeys.map(c => colors[c]);
-    constructLargeTable(sortedKeys, line,selectedColors);
-    constructMobileTable(sortedKeys, line,selectedColors);
+    constructLargeTable(sortedKeys, lineP,selectedColors);
+    constructMobileTable(sortedKeys, lineP,selectedColors);
 }
 
 // fillTableAggregegated constructs the aggregated table

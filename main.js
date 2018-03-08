@@ -205,14 +205,14 @@ function collectSkipchain() {
 // together for example.
 // NOTE: fields MUST NOT INCLUDE the polling station column, i.e. the first
 // column of the csv
-function aggregateData(data,fields) {
-    const aggregated = {};
-    // arr2.reduce((acc,key) => { acc[key] = di.map(entry => entry[key]).reduce((a,b) => a+b,0); return acc },{})
-    return fields.reduce((acc,key) => {
-        acc[key] = data.map(entry => entry[key]).reduce((a,b) => a+b,0);
-        return acc;
-    }, {});
-}
+/*function aggregateData(data,fields) {*/
+    //const aggregated = {};
+    //// arr2.reduce((acc,key) => { acc[key] = di.map(entry => entry[key]).reduce((a,b) => a+b,0); return acc },{})
+    //return fields.reduce((acc,key) => {
+        //acc[key] = data.map(entry => entry[key]).reduce((a,b) => a+b,0);
+        //return acc;
+    //}, {});
+/*}*/
 
 // fetchData returns the data as an array of objects, the keys being the column
 // names and the value being the cells value of the final table.
