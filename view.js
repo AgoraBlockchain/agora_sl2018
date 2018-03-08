@@ -11,11 +11,11 @@ const titleChart = "Election Results";
 function fillPage(skipchainData) {
     const data = skipchainData.data;
     const fields = skipchainData.fields;
-    const agg = skipchainData.aggregated;
+    //const agg = skipchainData.aggregated;
     const areas = skipchainData.areas;
     //const sortedFields = fields.slice();
     var [prunedData, prunedFields] = prune(data, fields);
-
+    const agg = aggregateData(prunedData,prunedFields);
     var sortedFields = sortAggregatedFields(agg,prunedFields);
     const colors = fieldsToColors(sortedFields);
 
@@ -121,7 +121,8 @@ function pruneData(data,prunedFields) {
 }
 
 function pruneFields(fields) {
-    return fields.slice(2);
+    const noName = fields.slice(2);
+    return noName.filter(v => v != blankNoteID);
 }
 
 // fillSelect creates two select list:
@@ -221,7 +222,8 @@ function fillChart(global) {
     // remove invalidNote
     var pruned = pruneFields(global.fields);
     var sortedFields = sortAggregatedFields(global.agg,pruned);
-    var pruned = sortedFields.slice().filter(v => v != invalidNoteID);
+    //var pruned = sortedFields.slice().filter(v => v != invalidNoteID);
+    var pruned = sortedFields;
     const rows = pruned.map(c => [c.trim(), global.agg[c]])
     const selectedColors = pruned.map(c => global.colors[c]);
 
@@ -435,6 +437,9 @@ function withPercentage(line) {
     const total = keys.reduce((acc, key) => acc + line[key], 0);
     return keys.reduce((acc, key) => {
         const v = line[key];
+        //const vD = new Decimal(v);
+        //const res = vD.dividedBy(total).mul(100).toFixed(2).toString();
+        //acc[key] = [v,res];
         acc[key] = [v, (v / total * 100).toFixed(2)];
         return acc;
     }, {});
