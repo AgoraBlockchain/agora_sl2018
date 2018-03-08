@@ -325,7 +325,7 @@ function formatField(f) {
 function formatFieldForChart(f) {
    const idx = f.indexOf("(");
    if (idx == -1)
-       return f;
+       return f.replace("Vote","Votes");
 
    return f.slice(0,idx-1) + "\n" + f.slice(idx);
 

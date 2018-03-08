@@ -89,14 +89,14 @@ function isEqual(skipData,skipFields, ethData) {
         return false;
     }
     //console.log("isEqual eth data",ethData);
-    for(var i = 0; i < skipData.length; i++) {
-        const skipName = skipData[i][key];
-        const ethName = ethData[i].Data[0];
-        if (skipName !== ethName) {
-            console.log("name not equal",skipName," vs ",ethName);
-            return false;
-        }
-    }
+    /*for(var i = 0; i < skipData.length; i++) {*/
+        //const skipName = skipData[i][key];
+        //const ethName = ethData[i].Data[0];
+        //if (skipName !== ethName) {
+            //console.log("name not equal",skipName," vs ",ethName);
+            //return false;
+        //}
+    /*}*/
     return true;
 }
 
@@ -191,28 +191,6 @@ function collectSkipchain() {
     });
 }
 
-
-// aggregateData returns an aggregated version of all the datas. It computes the
-// sum for each candidate for each pollign stations.
-// data is expected to be an array of dictionary where each item represents the
-// data of one pollign station
-// [
-//  { polling: <name>, candidate1: <x vote> }
-//  ...
-// ]
-//
-// Fields are the fields to aggregate. All candidate1 values will be aggregated
-// together for example.
-// NOTE: fields MUST NOT INCLUDE the polling station column, i.e. the first
-// column of the csv
-/*function aggregateData(data,fields) {*/
-    //const aggregated = {};
-    //// arr2.reduce((acc,key) => { acc[key] = di.map(entry => entry[key]).reduce((a,b) => a+b,0); return acc },{})
-    //return fields.reduce((acc,key) => {
-        //acc[key] = data.map(entry => entry[key]).reduce((a,b) => a+b,0);
-        //return acc;
-    //}, {});
-/*}*/
 
 // fetchData returns the data as an array of objects, the keys being the column
 // names and the value being the cells value of the final table.
