@@ -290,11 +290,13 @@ function dataKey() {
         return keyTest;
     }
     const url = window.location.href;
-    if (url.match(firstRound))
+    if (url.match("sierraleone2018/results")
         return keyRound1;
 
-    if (url.match(secondRound))
+    if (url.match("sierraleone2018/results2"))
         return keyRound2;
+
+
 }
 
 // fetchInfo will fetch the roster and the genesis block id and return a Promise
