@@ -221,7 +221,7 @@ function fillChart(global) {
     var sortedFields = sortAggregatedFields(global.agg,pruned);
     //var pruned = sortedFields.slice().filter(v => v != invalidNoteID);
     var pruned = sortedFields;
-    const rows = pruned.map(c => [c.trim(), global.agg[c]])
+    const rows = pruned.map(c => [formatField(c.trim()), global.agg[c]])
     const selectedColors = pruned.map(c => global.colors[c]);
 
     const drawChart = function () {
