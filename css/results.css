@@ -293,6 +293,11 @@ h7 {
     top: calc(50% + 50px);
     width: 220px; /* Need a specific value to work */
 }
+@media (min-width:768px) {
+    .loading-t {
+        width: 315px; /* Need a specific value to work */
+    }
+}
 .circle {
     position: absolute;
     top: calc(50% - 25px);
