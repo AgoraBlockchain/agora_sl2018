@@ -221,7 +221,7 @@ function fillChart(global) {
     var sortedFields = sortAggregatedFields(global.agg,pruned);
     //var pruned = sortedFields.slice().filter(v => v != invalidNoteID);
     var pruned = sortedFields;
-    const rows = pruned.map(c => [formatField(c.trim()), global.agg[c]])
+    const rows = pruned.map(c => [formatFieldForChart(c.trim()), global.agg[c]])
     const selectedColors = pruned.map(c => global.colors[c]);
 
     const drawChart = function () {
@@ -319,6 +319,15 @@ function formatField(f) {
        return f;
 
    return f.slice(0,idx-1) + "<br>" + f.slice(idx);
+}
+
+function formatFieldForChart(f) {
+   const idx = f.indexOf("(");
+   if (idx == -1)
+       return f;
+
+   return f.slice(0,idx-1) + "\n" + f.slice(idx);
+
 }
 // fillTableDetail constructs the detailled table
 function fillTableDetail(keys, line,colors) {
