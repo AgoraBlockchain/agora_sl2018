@@ -218,7 +218,7 @@ function fillChart(global) {
     // [candidate, vote]
     // remove invalidNote
     var pruned = pruneFields(global.fields);
-    var sortedFields = formatFields(sortAggregatedFields(global.agg,pruned));
+    var sortedFields = sortAggregatedFields(global.agg,pruned);
     //var pruned = sortedFields.slice().filter(v => v != invalidNoteID);
     var pruned = sortedFields;
     const rows = pruned.map(c => [c.trim(), global.agg[c]])
