@@ -196,18 +196,18 @@ h4 {
     position: relative;
     z-index: 5;
     font-family: 'LatoWebLight';
-    font-size: 12px;
-    line-height: 22px;
+    font-size: 10px;
+    line-height: 18px;
 }
 @media (min-width: 320px) {
     h4 {
-        font-size: 14px;
+        font-size: 12px;
     }
 }
 @media (min-width:768px) {
     h4 {
-        font-size: 16px;
-        line-height: 24px;
+        font-size: 14px;
+        line-height: 20px;
     }
 }
 
