@@ -68,7 +68,6 @@ function sortAggregatedFields(agg,fields) {
             return -1;
         return 0;
     });
-    copy.push(blankNoteID);
     copy.push(invalidNoteID);
     return copy;
 }
@@ -88,7 +87,6 @@ function sortDetailledFields(row,fields) {
             return -1;
         return 0;
     });
-    copy.push(blankNoteID);
     copy.push(invalidNoteID);
     return copy;
 }
@@ -96,7 +94,6 @@ function sortDetailledFields(row,fields) {
 // addStaticField puts the fields invalidNoteID and blankNoteID at the end in a
 // deterministic order
 function addStaticField(copy) {
-    copy.push(blankNoteID);
     copy.push(invalidNoteID);
 }
 
