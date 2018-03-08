@@ -163,7 +163,8 @@ function fillSelect(global) {
         if (selection === selectAreasAll) {
             // Hide
             //fillTableAggregegated(fields.slice(2),agg,colors);
-            fillTableAggregegated(fields,agg,colors);
+            const prunedFields = pruneFields(fields);
+            fillTableAggregegated(prunedFields,agg,colors);
             return;
         }
 
