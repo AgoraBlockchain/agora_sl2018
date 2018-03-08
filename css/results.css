@@ -196,18 +196,18 @@ h4 {
     position: relative;
     z-index: 5;
     font-family: 'LatoWebLight';
-    font-size: 12px;
-    line-height: 22px;
+    font-size: 10px;
+    line-height: 18px;
 }
 @media (min-width: 320px) {
     h4 {
-        font-size: 14px;
+        font-size: 12px;
     }
 }
 @media (min-width:768px) {
     h4 {
-        font-size: 16px;
-        line-height: 24px;
+        font-size: 14px;
+        line-height: 20px;
     }
 }
 
@@ -286,8 +286,12 @@ h7 {
 
 .loading-t {
     position: absolute;
+    left: 0; 
+    right: 0; 
+    margin-left: auto; 
+    margin-right: auto; 
     top: calc(50% + 50px);
-    left: calc(50% - 160px);
+    width: 220px; /* Need a specific value to work */
 }
 .circle {
     position: absolute;
