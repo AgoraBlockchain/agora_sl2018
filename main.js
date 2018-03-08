@@ -290,7 +290,7 @@ function dataKey() {
         return keyTest;
     }
     const url = window.location.href;
-    if (url.match("sierraleone2018/results")
+    if (url.match("sierraleone2018/results"))
         return keyRound1;
 
     if (url.match("sierraleone2018/results2"))
