@@ -310,7 +310,7 @@ const tableMobileId = "#results-table-mobile";
 // formatFields returns the candidate name with a <br> before the political
 // party name
 function formatFields(fields) {
-    return fields.map(f => formatField(f);
+    return fields.map(f => formatField(f));
 }
 
 function formatField(f) {
