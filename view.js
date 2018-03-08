@@ -315,6 +315,9 @@ function formatFields(fields) {
 
 function formatField(f) {
    const idx = f.indexOf("(");
+   if (idx == -1)
+       return f;
+
    return f.slice(0,idx-1) + "<br>" + f.slice(idx);
 }
 // fillTableDetail constructs the detailled table
