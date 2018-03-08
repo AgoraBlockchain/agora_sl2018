@@ -112,7 +112,7 @@ function prune(data, fields) {
 function pruneData(data,prunedFields) {
     return data.map(row => {
         // take only the value for the pruned fields
-        prunedFields.reduce((acc, f) => {
+        return prunedFields.reduce((acc, f) => {
             acc[f] = row[f];
             return acc;
         }, {});
@@ -145,9 +145,6 @@ function fillSelect(global) {
             const polls = areas[areaSelection];
             const filteredData = data.filter(row => polls.includes(row[fields[0]]));
             const prunedData = pruneData(filteredData,prunedFields);
-            console.log("before aggregatedDAta: filteredData:",filteredData);
-            console.log("before aggregatedDAta: prunedFields:",prunedFields);
-            console.log("before aggregatedDAta: prunedData:",prunedData);
             const pollAgg = aggregateData(prunedData,prunedFields);
             fillTableAggregegated(prunedFields,pollAgg,colors);
             return;
@@ -314,9 +311,6 @@ const tableMobileId = "#results-table-mobile";
 // fillTableDetail constructs the detailled table
 function fillTableDetail(keys, line,colors) {
     const sortedKeys = sortDetailledFields(line,keys);
-    console.log("filTableDetails => data",line);
-    console.log("filTableDetails => keys",keys);
-    console.log("filTableDetails => keys",sortedKeys);
     const lineP= withPercentage(line);
     const selectedColors = sortedKeys.map(c => colors[c]);
     constructLargeTable(sortedKeys, lineP,selectedColors);
