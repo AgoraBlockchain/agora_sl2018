@@ -245,7 +245,7 @@ function fillChart(global) {
             fontName: "LatoWebLight",
             legend: {
                 position: 'right',
-                alignment: "right",
+                alignment: "center",
                 maxLines: 3,
                 textStyle: {
                     color: "#3E3E3E",
