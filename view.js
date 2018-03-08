@@ -15,15 +15,6 @@ function fillPage(skipchainData) {
     const areas = skipchainData.areas;
     const sortedFields = fields.slice();
     var [prunedData, prunedFields] = prune(data, fields);
-    prunedFields.sort(function (a, b) {
-        var va = agg[a];
-        var vb = agg[b];
-        if (va < vb)
-            return 1;
-        if (va > vb)
-            return -1;
-        return 0;
-    });
     const colors = fieldsToColors(prunedFields);
     const global = {
         data: data,
@@ -78,8 +69,8 @@ function sortAggregatedFields(agg,fields) {
     return copy;
 }
 
-const blankNoteID = "Blank Note";
-const invalidNoteID = "Invalid Note";
+const blankNoteID = "Blank Vote";
+const invalidNoteID = "Invalid Vote";
 
 function sortDetailledFields(row,fields) {
     const copy = removeStaticFields(fields);
@@ -141,7 +132,6 @@ function fillSelect(global) {
     const fields = global.fields;
     const agg = global.agg;
     const areas = global.areas;
-    const sortedFields = global.sortedFields;
     const colors = global.colors;
     const [prunedData,prunedFields] = prune(data,fields);
     // callbackPolls is called whenever a selection changes from the drop down
@@ -175,7 +165,7 @@ function fillSelect(global) {
         if (selection === selectAreasAll) {
             // Hide
             //fillTableAggregegated(fields.slice(2),agg,colors);
-            fillTableAggregegated(sortedFields,agg,colors);
+            fillTableAggregegated(fields,agg,colors);
             return;
         }
 
@@ -228,8 +218,14 @@ function fieldsToColors(candidates) {
 function fillChart(global) {
     // take sorted by vote
     // [candidate, vote]
-    const rows = global.sortedFields.map(c => [c.trim(), global.agg[c]])
-    const selectedColors = global.sortedFields.map(c => global.colors[c]);
+    // remove invalidNote
+    var pruned = pruneFields(global.fields);
+    var sortedFields = sortAggregatedFields(global.agg,pruned);
+    console.log("sortedfields = ",sortedFields);
+    var pruned = sortedFields.slice().filter(v => v != invalidNoteID);
+    console.log("pruned = ",pruned);
+    const rows = pruned.map(c => [c.trim(), global.agg[c]])
+    const selectedColors = pruned.map(c => global.colors[c]);
 
     const drawChart = function () {
         // create the data table.
