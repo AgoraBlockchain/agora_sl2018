@@ -81,10 +81,10 @@ function verifyEquality(skipInfo, ethData) {
     const skipData = skipInfo.data;
     const key = skipFields[0];
     const lengthEqual = skipData.length === ethData.length;
-    if (!lengthEqual) {
-        console.log("ethereum data not same length",skipData.length," vs ", ethData.length);
-        return Promise.resolve(true);
-    }
+    /*if (!lengthEqual) {*/
+        //console.log("ethereum data not same length",skipData.length," vs ", ethData.length);
+        //return Promise.resolve(true);
+    //}
 
     // hash the skipdata
     var sortedSkip  = skipData.slice();
@@ -109,7 +109,8 @@ function verifyEquality(skipInfo, ethData) {
     buffer = new TextEncoder("utf-8").encode(ethStr);
     var ethHashPromise = crypto.subtle.digest("SHA-256", buffer);
 
-    return Promise.all([skipHashPromise,ethHashPromise]).then((h1,h2) => {
+    return Promise.all([skipHashPromise,ethHashPromise]).then(results => {
+        var [h1,h2] = results;
         if (h1.toString() == h2.toString()) {
             console.log("ethereum data is equal to skipchain data");
         } else {
