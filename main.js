@@ -306,7 +306,7 @@ function fetchInfo() {
             dataType: "text",
             contentType: "text/plain",
         }).done(function(roster) {
-                console.log("roster fetched sucesfully: " + roster);
+                console.log("roster fetched sucesfully");
                 resolve(roster.trim());
         }).fail(function(obj, text,err) {
             console.log("error fetching roster @ : " + text);
