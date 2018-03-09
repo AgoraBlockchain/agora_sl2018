@@ -65,11 +65,7 @@ $(function() {
     }).then(info => {
         var [skipchainData, ethData] = info;
         console.log("ethereum data resolved");
-        if (isEqual(skipchainData.data,skipchainData.fields,ethData)) {
-            console.log("DATA ARE EQUAL");
-        } else {
-            console.log("DATA ARE NOT EQUAL");
-        }
+        return verifyEquality(skipchainData,ethData);
     }).catch(err => {
         //dialog.find(".bootbox-body").html('<div class="alert alert-danger"> Oups. There\'s an error, it\'s our fault and we\'re working to fix!</div>');
         throw err;
@@ -80,24 +76,46 @@ $(function() {
 // skipchain data. THERE SHOULD NOT BE.
 // It returns a boolean if both data are equal
 // It returns false if both data are not equal
-function isEqual(skipData,skipFields, ethData) {
+function verifyEquality(skipInfo, ethData) {
+    const skipFields = skipInfo.fields;
+    const skipData = skipInfo.data;
     const key = skipFields[0];
     const lengthEqual = skipData.length === ethData.length;
     if (!lengthEqual) {
-        console.log("not same length",skipData.length," vs ", ethData.length);
-        //console.log(ethData);
-        return false;
+        console.log("ethereum data not same length",skipData.length," vs ", ethData.length);
+        return Promise.resolve(true);
     }
-    //console.log("isEqual eth data",ethData);
-    /*for(var i = 0; i < skipData.length; i++) {*/
-        //const skipName = skipData[i][key];
-        //const ethName = ethData[i].Data[0];
-        //if (skipName !== ethName) {
-            //console.log("name not equal",skipName," vs ",ethName);
-            //return false;
-        //}
-    /*}*/
-    return true;
+
+    // hash the skipdata
+    var sortedSkip  = skipData.slice();
+    sortedSkip.sort(function(a,b) {
+		var stationA = a[key].toUpperCase();
+		var stationB = b[key].toUpperCase();
+		return (stationA < stationB) ? -1 : (stationA > stationB) ? 1 : 0;
+    });
+
+    var skipStr = sortedSkip.reduce((tableStr,row) => {
+        return tableStr + skipFields.reduce((rowStr,f) =>  {
+            return rowStr + row[f].toString()
+        },"");
+    },"");
+
+    var buffer = new TextEncoder("utf-8").encode(skipStr);
+    var skipHashPromise = crypto.subtle.digest("SHA-256", buffer);
+
+    var ethStr = ethData.reduce((tableStr, row) => {
+        return tableStr + row.Data.join("");
+    },"");
+    buffer = new TextEncoder("utf-8").encode(ethStr);
+    var ethHashPromise = crypto.subtle.digest("SHA-256", buffer);
+
+    return Promise.all([skipHashPromise,ethHashPromise]).then((h1,h2) => {
+        if (h1.toString() == h2.toString()) {
+            console.log("ethereum data is equal to skipchain data");
+        } else {
+            console.log("ethereum data seems outdated...");
+        }
+    });
 }
 
 // collectEthereum does the following:
