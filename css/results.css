@@ -8,6 +8,10 @@
     --color-black: #3E3E3E;
 }
 
+svg > g > g:last-child { 
+    pointer-events: none;
+}
+
 .color-agora,
 .color-agora:hover,
 .color-agora:visited {
@@ -182,7 +186,7 @@ h3 {
 }
 @media (min-width:768px) {
     h3 {
-        font-size: 16px;
+        font-size: 20px;
         line-height: 24px;
     }
 }
@@ -192,8 +196,19 @@ h4 {
     position: relative;
     z-index: 5;
     font-family: 'LatoWebLight';
-    font-size: 16px;
-    font-style: italic;
+    font-size: 10px;
+    line-height: 18px;
+}
+@media (min-width: 320px) {
+    h4 {
+        font-size: 12px;
+    }
+}
+@media (min-width:768px) {
+    h4 {
+        font-size: 14px;
+        line-height: 20px;
+    }
 }
 
 h5 {
@@ -271,8 +286,17 @@ h7 {
 
 .loading-t {
     position: absolute;
+    left: 0; 
+    right: 0; 
+    margin-left: auto; 
+    margin-right: auto; 
     top: calc(50% + 50px);
-    left: calc(50% - 128px);
+    width: 220px; /* Need a specific value to work */
+}
+@media (min-width:768px) {
+    .loading-t {
+        width: 315px; /* Need a specific value to work */
+    }
 }
 .circle {
     position: absolute;
@@ -323,9 +347,19 @@ h7 {
 	100% { -webkit-transform:rotate(360deg); }
 }
 
+.sierra-leone-flag {
+    width: 111px;
+    height: 74px;
+}
+
 #piechart {
-  width: 100%; 
-  min-height: 500px;
+  width: 100%;
+  height: 300px;
+}
+@media (min-width:768px) {
+    #piechart {
+        height: 500px;
+    }
 }
 
 /*SECTIONS*/
@@ -339,6 +373,7 @@ section {
     background: linear-gradient(#FDFBFB,#F5F7FA);
 }
 
+#select-area,
 #select-polling {
     border: 1;
     outline: none;
@@ -348,6 +383,7 @@ section {
     text-align-last:center;
     font-family: 'LatoWebLight';
     font-size: 22px;
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16);
 }
 
 input:focus,
@@ -357,7 +393,10 @@ button:focus {
     outline: none;
 }
 
-.selection {
+.selection,
+.selection-area {
+    text-align: center;
+    text-align-last:center;
 }
 #results-table {
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16);
@@ -371,7 +410,7 @@ button:focus {
 }
 .candidate-td {
     height: 70px;
-    border: 1px solid var(--color-gray);
+    border: 1px solid #E5E5E5;
     background: white;
     text-align: center;
 }
@@ -397,4 +436,11 @@ button:focus {
 .vote {
     font-family: 'LatoWebLight';
     font-size: 90%;
+}
+
+
+.logo {
+    display: block;
+    margin: auto;
+    max-width: 90px;
 }

@@ -1,100 +1,231 @@
 // colors to use to decorate the chart and the table
-const staticColors = ['#35A1EA', '#4BC0BF', '#107189', '#00C200', '#1E3798', '#808100', '#9898FE', '#8700A1', '#F11EEC', '#FF6383', '#A5FFC1', '#65FFFF', '#FFC8DE', '#E4BCFF', '#BDFF00', '#FFF031', '#FFD8AE', '#FF0000', '#9B0000', '#A26B22', '#FFCD55', '#FF9A00', '#000000', '#B7B7B7', '#FFFFFF'];
+const staticColors = ['#005BB0', '#177BD9', '#73AFE8', '#B9D7F3', '#00B0DC', '#5CD7F6', '#A2E8FA', '#D0F3FC', '#24955B', '#33D582', '#6EEFAC', '#B6F7D5', '#7D10F2', '#A051F5', '#CFA8FA', '#E7D3FC', '#E55000', '#EC7F45', '#F5BFA2', '#FCEFE7', '#9B0331', '#F2044C', '#F5487C', '#FBBACE', '#879DB1'];
 
-const staticCandidates = ['Kandeh Conteh', 'Kandeh Yumkella', 'Samura Kamara', 'Beresford Williams', 'Charles Margai', 'Gbandi Ngobeh', 'Henry Kabuta', 'Jonathan Sandy', 'Julius Bio', 'Mohamed Sowa', 'Mohamed Mansaray', 'Mohamed C Bah', 'Musa Tarawally', "Patrick O'Dwyer", 'Samuel Sam-Sumana', 'Olufemi Claudius-Cole', 'Blank Note', 'Invalid Note'];
+// key representing "all" data from the drop down list
+const selectAreasAll = "All Areas";
+const selectPollsAll = "All Polling Stations";
+const titleChart = "Election Results";
 
 // fillPage takes care of filling the page with the data, the fields and the
 // aggregated data
-function fillPage(data,fields,agg) {
+function fillPage(skipchainData) {
+    const data = skipchainData.data;
+    const fields = skipchainData.fields;
+    const areas = skipchainData.areas;
+    var [prunedData, prunedFields] = prune(data, fields);
+    const agg = aggregateData(prunedData,prunedFields);
+    var sortedFields = sortAggregatedFields(agg,prunedFields);
+    const colors = fieldsToColors(sortedFields);
+    const global = {
+        data: data,
+        fields: fields,
+        agg: agg,
+        areas: areas,
+        sortedFields: sortedFields,
+        colors: colors,
+    }
     // fill the aggregated data pie chart
-    fillAggregated(agg);
+    fillChart(global);
     // fill select list
-    fillSelect(data,fields,agg);
+    //fillSelect(data,fields,agg,areas);
+    fillSelect(global);
     // fill the table
-    var [prunedData,prunedFields] = prune(data,fields);
     // show by default the aggregated table
-    fillTableAggregegated(prunedFields,agg);
+    fillTableAggregegated(prunedFields, agg,colors);
     hideWaitingDialog();
 }
 
-// remove the first entry of each since it's polling station data
-function prune(data,fields) {
-    const toPrune = fields[0];
-    const prunedFields = fields.slice(1);
-    const prunedData = data.map(row => {
+// aggregateData returns an aggregated version of all the datas. It computes the
+// sum for each candidate for each pollign stations.
+// data is expected to be an array of dictionary where each item represents the
+// data of one pollign station
+// Fields are the fields to aggregate. All candidate1 values will be aggregated
+// together for example.
+// NOTE: fields MUST NOT INCLUDE the polling station column, i.e. the first
+// column of the csv
+function aggregateData(data,fields) {
+    const aggregated = {};
+    // arr2.reduce((acc,key) => { acc[key] = di.map(entry => entry[key]).reduce((a,b) => a+b,0); return acc },{})
+    return fields.reduce((acc,key) => {
+        acc[key] = data.map(entry => entry[key]).reduce((a,b) => a+b,0);
+        return acc;
+    }, {});
+}
+
+//
+function sortAggregatedFields(agg,fields) {
+    const copy = removeStaticFields(fields);
+    copy.sort(function (a, b) {
+        var va = agg[a];
+        var vb = agg[b];
+        if (va < vb)
+            return 1;
+        if (va > vb)
+            return -1;
+        return 0;
+    });
+    copy.push(invalidNoteID);
+    return copy;
+}
+
+const blankNoteID = "Blank Vote";
+const invalidNoteID = "Invalid Vote";
+
+function sortDetailledFields(row,fields) {
+    const copy = removeStaticFields(fields);
+    copy.sort(function (a, b) {
+        var va = row[a];
+        var vb = row[b];
+
+        if (va < vb)
+            return 1;
+        if (va > vb)
+            return -1;
+        return 0;
+    });
+    copy.push(invalidNoteID);
+    return copy;
+}
+
+// addStaticField puts the fields invalidNoteID and blankNoteID at the end in a
+// deterministic order
+function addStaticField(copy) {
+    copy.push(invalidNoteID);
+}
+
+function removeStaticFields(fields) {
+    var copy = fields.slice();
+    return copy.filter(v => (v != invalidNoteID && v != blankNoteID))
+}
+
+// remove the first two entry of each since it's polling station data
+function prune(data, fields) {
+    // remove Polling station AND area
+    const prunedFields = pruneFields(fields);
+    const prunedDataa = pruneData(data,prunedFields);
+    return [prunedDataa, prunedFields];
+}
+
+function pruneData(data,prunedFields) {
+    return data.map(row => {
         // take only the value for the pruned fields
-        return prunedFields.reduce((acc,f) => {
+        return prunedFields.reduce((acc, f) => {
             acc[f] = row[f];
             return acc;
-        },{});
+        }, {});
     });
-    return [prunedData,prunedFields];
+
 }
 
-// fillSelect takes a list of names to put in the selection and a callback
-// associated with each. The callback must be a function such as:
-// function(name) { ... }
-// the default will be the first name given
-function fillSelect(data,fields,agg) {
-    // selectCallback is called whenever a selection changes from the drop down
+function pruneFields(fields) {
+    const noName = fields.slice(2);
+    return noName.filter(v => v != blankNoteID);
+}
+
+// fillSelect creates two select list:
+//  one for the areas
+//  one for the polling stations
+function fillSelect(global) {
+    const data = global.data;
+    const fields = global.fields;
+    const agg = global.agg;
+    const areas = global.areas;
+    const colors = global.colors;
+    const [prunedData,prunedFields] = prune(data,fields);
+    // callbackPolls is called whenever a selection changes from the drop down
     // list of polling station names
-    const callback = function(event) {
-        const selection = $("select option:selected").text();
-        if (selection === selectKeyAll) {
-            // do not show the polling station column
-            fillTableAggregegated(fields.slice(1),agg);
-            return
+    const callbackPolls = function(event) {
+        const prunedFields = pruneFields(fields);
+        const pollSelection = $("#select-polling option:selected").text();
+        const areaSelection = $("#select-area option:selected").text();
+        // show aggregted poll stations from the area
+        if (pollSelection === selectPollsAll) {
+            const polls = areas[areaSelection];
+            const filteredData = data.filter(row => polls.includes(row[fields[0]]));
+            const prunedData = pruneData(filteredData,prunedFields);
+            const pollAgg = aggregateData(prunedData,prunedFields);
+            fillTableAggregegated(prunedFields,pollAgg,colors);
+            return;
         }
-        // do not show the polling station column
         const key = fields[0];
-        const filtered = data.filter(dict => dict[key] === selection);
-        var [prunedData,prunedFields] = prune(filtered,fields);
-        fillTableDetail(prunedFields,prunedData);
-
+        const filtered = data.filter(dict => dict[key] === pollSelection);
+        var prunedData = pruneData(filtered,prunedFields);
+        fillTableDetail(prunedFields,prunedData[0],colors);
     }
-    // list of all polling station names
-    const names = [selectKeyAll].concat(data.map(entry => entry[fields[0]]));
-    //const names = data.map(entry => entry[fields[0]]);
-    const select = $("#select-polling");
-    select.remove("option");
-    names.forEach((name,idx) => {
-        const html = '<div class="selection">'+name+'</div>';
-        const opt = $("<option></option>").html(html);
+
+    const callbackArea = function(event) {
+        // Hide in any case
+        const selectPolls = $("#select-polling");
+        selectPolls.contents().remove();
+        selectPolls.addClass("d-none");
+
+        const selection = $("#select-area option:selected").text();
+        if (selection === selectAreasAll) {
+            // Hide
+            //fillTableAggregegated(fields.slice(2),agg,colors);
+            const prunedFields = pruneFields(fields);
+            fillTableAggregegated(prunedFields,agg,colors);
+            return;
+        }
+
+        // list of all polling station names
+        selectPolls.change(callbackPolls);
+        const names = [selectPollsAll].concat(areas[selection]);
+        names.forEach((name,idx) => {
+            const html = '<div class="selection">'+name+'</div>';
+            const opt = $("<option></option>").attr({value:name}).html(html);
+            if (idx == 0)
+                opt.attr("selected",true)
+
+            opt.appendTo(selectPolls);
+        });
+        // trigger the polling names
+        selectPolls.val(names[0]).trigger('change');
+        $("#select-polling").removeClass("d-none");
+    }
+
+    /////////////////////
+    // areas select
+    // //////////////////
+    const areaNames = [selectAreasAll].concat(Object.keys(areas));
+    const selectAreas = $("#select-area");
+    // clear any previous options
+    selectAreas.contents().remove();
+    selectAreas.change(callbackArea);
+    areaNames.forEach((area,idx) => {
+        const html = '<div class="selection-area">'+area+'</div>';
+        const opt = $("<option></option>").attr({value:area}).html(html);
         if (idx == 0)
-            opt.attr("selected",true)
+            opt.attr("selected", true)
 
-        opt.appendTo(select);
+        opt.appendTo(selectAreas);
     });
-    select.change(callback);
+    // call it first
+    selectAreas.val(selectAreasAll).trigger('change');
 }
-
 
 // fieldsToColors makes a deterministic mapping from a field name to a color
 // the same color is used to draw the table and the chart
-function fieldsToColors(fields) {
-    return fields.map((v,i) => staticColors[i]);
+function fieldsToColors(candidates) {
+    const mapping = {};
+    candidates.forEach((candidate,idx) => {
+        mapping[candidate] = staticColors[idx];
+    });
+    return mapping;
 }
 // fill the aggregated textarea => TO CHANGE with a nice graph
-function fillAggregated(aggregated) {
-    // sort by vote
-    const rows = Object.keys(aggregated).map(key => [key.trim(),aggregated[key]])
-        .sort(function(a,b) {
-            if (a[1] < b[1]) {
-                return  1;
-            }
-            if (a[1] > b[1]) {
-                return -1;
-            }
-            return 0;
-        });
-        /*var n = 18;
-        for(var i =0; i < n;i++) {
-            rows.push(["candidat"+i,i*8]);
-        }*/
+function fillChart(global) {
+    // take sorted by vote
+    // [candidate, vote]
+    // remove invalidNote
+    var pruned = pruneFields(global.fields);
+    var sortedFields = sortAggregatedFields(global.agg,pruned);
+    //var pruned = sortedFields.slice().filter(v => v != invalidNoteID);
+    var pruned = sortedFields;
+    const rows = pruned.map(c => [formatFieldForChart(c.trim()), global.agg[c]])
+    const selectedColors = pruned.map(c => global.colors[c]);
 
-    const selectedColors = fieldsToColors(rows);
-
-    const drawChart = function() {
+    const drawChart = function () {
         // create the data table.
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Candidate');
@@ -102,37 +233,73 @@ function fillAggregated(aggregated) {
         data.addRows(rows);
 
         // set chart options
-        var options = {'title':"",
-                       backgroundColor: { fill:'transparent' },
-                       colors: selectedColors,
-                       fontName: "LatoWebLight",
-                       legend: {
-                           position: 'right',
-                           alignment: "center",
-                           maxLines: 3,
-                           textStyle:{
-                               color: "#3E3E3E",
-                               fontName: "LatoWebLight",
-                               fontSize: 20,
-                           }
-                       },
-                       sliceVisibilityThreshold: 0.02,
-                       pieResidueSliceLabel: "Other",
-                       chartArea: {
-                           left: 0,
-                           top: 25,
-                           width: "100%",
-                           height: "90%"
-                       }
-                      };
+        var options = {
+            'title': "",
+            backgroundColor: {
+                fill: 'transparent'
+            },
+            colors: selectedColors,
+            fontName: "LatoWebLight",
+            legend: {
+                position: 'right',
+                alignment: "center",
+                maxLines: 3,
+                textStyle: {
+                    color: "#3E3E3E",
+                    fontName: "LatoWebLight",
+                    fontSize: 20,
+                }
+            },
+            sliceVisibilityThreshold: 0.02,
+            pieResidueSliceLabel: "Other",
+            chartArea: {
+                left: 0,
+                top: 25,
+                width: "100%",
+                height: "90%"
+            }
+        };
+
+        // set chart options
+        var optionsMobile = {
+            'title': "",
+            backgroundColor: {
+                fill: 'transparent'
+            },
+            colors: selectedColors,
+            fontName: "LatoWebLight",
+            fontSize: 10,
+            legend: {
+                position: 'right',
+                alignment: "center",
+                textStyle: {
+                    color: "#3E3E3E",
+                    fontName: "LatoWebLight",
+                    fontSize: 12,
+                }
+            },
+            sliceVisibilityThreshold: 0.02,
+            pieResidueSliceLabel: "Other",
+            chartArea: {
+                left: 0,
+                top: 25,
+                width: "100%",
+                height: "100%"
+            }
+        };
 
         // instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-        chart.draw(data, options);
+        var mq = window.matchMedia("(min-width: 768px)");
+        if (mq.matches) {
+            chart.draw(data, options);
+        }else {
+            chart.draw(data, optionsMobile);
+        }
     }
 
-    $(window).resize(function(){
-      drawChart();
+    $(window).resize(function () {
+        drawChart();
     });
     // Set a callback to run when the Google Visualization API is loaded.
     google.charts.setOnLoadCallback(drawChart);
@@ -141,71 +308,57 @@ function fillAggregated(aggregated) {
 const tableLargeId = "#results-table";
 const tableMobileId = "#results-table-mobile";
 
-// fillTableDetail constructs the detailled table
-function fillTableDetail(keys,data) {
-    const sortedKeys = keys.slice();
-    sortedKeys.sort(function(a,b) {
-        var va = data[0][a];
-        var vb = data[0][b];
-        if (va < vb)
-            return 1;
-        if (va > vb)
-            return -1;
-        return 0;
-    });
+// formatFields returns the candidate name with a <br> before the political
+// party name
+function formatFields(fields) {
+    return fields.map(f => formatField(f));
+}
 
-    const line = withPercentage(data[0]);
-    constructLargeTable(sortedKeys,line);
-    constructMobileTable(sortedKeys,line);
+function formatField(f) {
+   const idx = f.indexOf("(");
+   if (idx == -1)
+       return f.replace("Vote","Votes");
+
+   return f.slice(0,idx-1) + "<br>" + f.slice(idx);
+}
+
+function formatFieldForChart(f) {
+   const idx = f.indexOf("(");
+   if (idx == -1)
+       return f.replace("Vote","Votes");
+
+   return f.slice(0,idx-1) + "\n" + f.slice(idx);
+
+}
+// fillTableDetail constructs the detailled table
+function fillTableDetail(keys, line,colors) {
+    const sortedKeys = sortDetailledFields(line,keys);
+    const lineP= withPercentage(line);
+    const selectedColors = sortedKeys.map(c => colors[c]);
+    constructLargeTable(sortedKeys, lineP,selectedColors);
+    constructMobileTable(sortedKeys, lineP,selectedColors);
 }
 
 // fillTableAggregegated constructs the aggregated table
-function fillTableAggregegated(keys,agg) {
-    const sortedKeys = keys.slice();
-    sortedKeys.sort(function(a,b) {
-        var va = agg[a];
-        var vb = agg[b];
-         if (va < vb)
-            return 1;
-        if (va > vb)
-            return -1;
-        return 0;
-    });
-
-    const line = withPercentage(sortedKeys.reduce((acc,key) => {
-        acc[key] = agg[key];
-        return acc;
-    },{}));
-
-    constructLargeTable(sortedKeys,line);
-    constructMobileTable(sortedKeys,line);
+function fillTableAggregegated(fields, agg, colors) {
+    const sortedFields = sortAggregatedFields(agg,fields);
+    const line = withPercentage(agg);
+    const selectedColors = sortedFields.map(c => colors[c]);
+    constructLargeTable(sortedFields, line,selectedColors);
+    constructMobileTable(sortedFields, line,selectedColors);
 }
 
-const mobileHeaderCandidate = "Candidate";
-const mobileHeaderVote = "Count";
-
 // constructMobileTable creates the table a  mobile screen
-function constructMobileTable(sortedKeys,line) {
-    $(tableMobileId).find("thead tr").remove();
-    // headers are two columns: polling station | vote
-    const tr = $('<tr></tr>');
-    $("<th></th>").html('<div class="candidate-name">' + mobileHeaderCandidate
-        + '</div>').appendTo(tr);
-    $("<th></th>").html('<div class="candidate-vote">' + mobileHeaderVote
-        + '</div>').appendTo(tr);
-    $(tableMobileId).find("thead").append(tr);
-
-
+function constructMobileTable(sortedKeys, line, selectedColors) {
     const tbody = $(tableMobileId).find("tbody");
-    const selectedColors = fieldsToColors(sortedKeys);
 
     $(tableMobileId).find("tbody tr").remove();
-    sortedKeys.forEach((key,idx) => {
+    sortedKeys.forEach((key, idx) => {
         const tr = $("<tr></tr>");
         var vote = line[key];
         // add candidate
         const color = selectedColors[idx];
-        $('<td class="candidate-td"></td>').html(candidateTd(key,color)).appendTo(tr);
+        $('<td class="candidate-td"></td>').html(candidateTd(key, color)).appendTo(tr);
         // add vote
         voteTd(vote).appendTo(tr);
         tbody.append(tr);
@@ -216,29 +369,31 @@ function constructMobileTable(sortedKeys,line) {
 const wrapOverCell = 8;
 
 // constructLargeTable creates the table for a large screen
-function constructLargeTable(sortedKeys,line) {
+function constructLargeTable(sortedKeys, line,selectedColors) {
     //constructLargeHeaders(sortedKeys);
 
     const tableBody = $(tableLargeId).find("tbody");
     tableBody.find("tr").remove();
 
-    const selectedColors = fieldsToColors(sortedKeys);
     // returns the HTML that is put for one field and color
 
     var candidateRow = $("<tr></tr>");
     var voteRow = $("<tr></tr>");
-    sortedKeys.forEach((key,idx) => {
+    sortedKeys.forEach((key, idx) => {
         // append candidate
         const color = selectedColors[idx];
         const candidateCell = $('<td></td>')
-            .html(candidateTd(key,color))
-            .attr({class:"candidate",scope:"col"})
+            .html(candidateTd(key, color))
+            .attr({
+                class: "candidate",
+                scope: "col"
+            })
             .appendTo(candidateRow);
         // append vote
         const vote = line[key];
         voteTd(vote).appendTo(voteRow);
         // wrap over?
-        const mustWrap = ((idx+1) % wrapOverCell) === 0;
+        const mustWrap = ((idx + 1) % wrapOverCell) === 0;
         const isAtEnd = idx === (sortedKeys.length - 1);
         if (mustWrap || isAtEnd) {
             // append the two rows and create a new second tuple
@@ -258,22 +413,25 @@ function constructLargeHeaders(fields) {
     const tr = $('<tr></tr>');
     const selectedColors = fieldsToColors(fields);
     // returns the HTML that is put for one field and color
-    const htmlTh = function(i) {
+    const htmlTh = function (i) {
         const field = fields[i];
         const color = selectedColors[i];
         return '<div class="candidate-color" style="background:' + color +
             ';"></div>' + candidateDiv(field);
     };
 
-    for(var i = 0; i < fields.length; i++) {
-        const th = $('<th></th>').html(htmlTh(i)).attr({class:"candidate",scope:"col"}).appendTo(tr);
+    for (var i = 0; i < fields.length; i++) {
+        const th = $('<th></th>').html(htmlTh(i)).attr({
+            class: "candidate",
+            scope: "col"
+        }).appendTo(tr);
     }
     $(tableLargeId).find("tbody").append(tr);
 }
 
-function candidateTd(name,color) {
+function candidateTd(name, color) {
     return '<div class="candidate-color" style="background:' + color +
-            ';"></div>' + candidateDiv(name);
+        ';"></div>' + candidateDiv(formatField(name));
 };
 
 // voteTd returns the td used for displaying a vote
@@ -281,14 +439,14 @@ function voteTd(text) {
     if (text === undefined) text = "";
     const num = text[0];
     const perc = text[1];
-    const html = '<div class="vote">'+num+'<br>'+perc+'%</div>';
+    const html = '<div class="vote">' + num + '<br>' + perc + '%</div>';
     return $("<td class='vote-c'></td>").html(html);
 }
 
 
 // candidateDiv returns the div to write to a candidate name
 function candidateDiv(text) {
-    return '<div class="candidate-name">'+text+'</div>';
+    return '<div class="candidate-name">' + text + '</div>';
 }
 
 // withPercentage returns an array of [vote,%]
@@ -296,19 +454,16 @@ function candidateDiv(text) {
 // output is a dictionary Candidate => [Count, percentage]
 function withPercentage(line) {
     const keys = Object.keys(line);
-    const total = keys.reduce((acc,key) => acc+line[key],0);
-    return keys.reduce((acc,key) => {
+    const total = keys.reduce((acc, key) => acc + line[key], 0);
+    return keys.reduce((acc, key) => {
         const v = line[key];
-        acc[key] = [v,(v / total * 100).toFixed(2)];
+        //const vD = new Decimal(v);
+        //const res = vD.dividedBy(total).mul(100).toFixed(2).toString();
+        //acc[key] = [v,res];
+        acc[key] = [v, (v / total * 100).toFixed(2)];
         return acc;
-    },{});
+    }, {});
 }
-// displayInfo writes some info about the roster and the skipchain id the page
-// is using
-//function displayInfo(roster,genesisID) {
-//    $("#title-skipid").text("skipchain ID: " + genesisID);
-//}
-
 
 function initView() {
     showWaitingDialog();
@@ -319,8 +474,7 @@ var dialog = null;
 var callBack;
 // showWaitingDialog shos the dialog with some waiting information
 function showWaitingDialog() {
-    callBack = function() {
-    }
+    callBack = function () {}
 }
 
 // hideWaitingDialog hides the dialog with a timeout of 70ms because it can't be
